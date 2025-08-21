@@ -38,6 +38,7 @@
             android:id="@+id/imageView"
             android:layout_width="60dp"
             android:layout_height="60dp"
+            android:background="#30111C"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -45,7 +46,7 @@
             app:srcCompat="@drawable/cat" />
 
         <ImageButton
-            android:id="@+id/imageButton4"
+            android:id="@+id/sideMenuButton"
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_marginStart="16dp"

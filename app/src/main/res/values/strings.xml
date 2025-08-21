@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Music Player</string>
     <string name="folders">Pastas</string>
+    <string name="allMusics">Todas musicas</string>
+    <string name="Login">Login</string>
+    <string name="onMusic">Musicas Online</string>
 </resources>

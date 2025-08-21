@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item android:title="@string/folders" />
-    <item android:title="Item" />
-    <item android:title="Item" />
-    <item android:title="Item" />
+    <item android:title="@string/allMusics" />
+    <item android:title="@string/onMusic" />
+    <item android:title="@string/Login" />
 </menu>
