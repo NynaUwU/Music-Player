@@ -56,7 +56,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/menu_100dp_0e0100_fill0_wght400_grad0_opsz48" />
+            app:srcCompat="@drawable/menubut" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -75,7 +75,7 @@
             style="@android:style/Widget.DeviceDefault.ImageButton"
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:background="@drawable/skip_next_100dp_0e0100_fill0_wght400_grad0_opsz48"
+            android:background="@drawable/skip_next"
             android:scaleType="centerInside"
             android:tint="#00FFFFFF"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -96,7 +96,7 @@
             app:layout_constraintHorizontal_bias="0.045"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/album_100dp_0e0100_fill0_wght400_grad0_opsz48" />
+            app:srcCompat="@drawable/album" />
 
         <ImageButton
             android:id="@+id/playButton"
@@ -109,7 +109,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/forwardButton"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/play_circle_100dp_0e0100_fill0_wght400_grad0_opsz48" />
+            app:srcCompat="@drawable/play_circle" />
 
         <ImageButton
             android:id="@+id/backButton"
@@ -122,7 +122,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/playButton"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/skip_previous_100dp_0e0100_fill0_wght400_grad0_opsz48" />
+            app:srcCompat="@drawable/skip_previous" />
 
         <TextView
             android:id="@+id/musicPlayName"
@@ -131,6 +131,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
             android:text="music template"
+            android:textColor="@color/md_theme_background_highContrast"
             android:textSize="10sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/imageView3"
@@ -138,4 +139,15 @@
             app:layout_constraintVertical_bias="0.152" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view_musicas"
+        android:layout_width="409dp"
+        android:layout_height="573dp"
+        android:layout_marginTop="2dp"
+        app:layout_constraintBottom_toTopOf="@+id/frameLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/frameLayout2" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
+
