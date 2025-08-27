@@ -1,5 +1,6 @@
 package com.example.musicplayer;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
@@ -17,9 +18,8 @@ import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnMusicaClickListener {
+    Context context;
 
-
-   ImageButton sideMenuButton = findViewById(R.id.sideMenuButton);
     private RecyclerView recyclerView;
     private MusicaAdapter musicaAdapter;
     private List<Musica> listaMusicas;
@@ -28,49 +28,38 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
+        context=this;
 
-        setContentView(R.layout.activity_main);
-
-        ImageButton sideMenuButton = findViewById(R.id.sideMenuButton);
-
-        musicaAdapter = new MusicaAdapter(this, new ArrayList<>());
-
-        sideMenuButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                // Code to execute when the button is clicked
-                // For example, display a Toast message:
-                Toast.makeText(MainActivity.this, "Button clicked!", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-    }
-    private void initViews() {
         recyclerView = findViewById(R.id.recycler_view_musicas);
+
+        listaMusicas = new ArrayList<>();
+        setupRecyclerView();
+        setContentView(R.layout.activity_main);
+        carregarMusicas();
+
     }
+
 
     private void setupRecyclerView() {
-        if (recyclerView != null) {
-            recyclerView.setLayoutManager(new LinearLayoutManager(this));
             listaMusicas = new ArrayList<>();
             musicaAdapter = new MusicaAdapter(this, listaMusicas);
             musicaAdapter.setOnMusicaClickListener(this);
             recyclerView.setAdapter(musicaAdapter);
-        }
+
     }
 
     private void carregarMusicas() {
         // Dados de exemplo - substitua pela sua fonte de dados
-        listaMusicas.add(new Musica("Bohemian Rhapsody", "Queen", "5:55"));
-        listaMusicas.add(new Musica("Hotel California", "Eagles", "6:30"));
-        listaMusicas.add(new Musica("Stairway to Heaven", "Led Zeppelin", "8:02"));
-        listaMusicas.add(new Musica("Imagine", "John Lennon", "3:03"));
-        listaMusicas.add(new Musica("Sweet Child O' Mine", "Guns N' Roses", "5:03"));
-        listaMusicas.add(new Musica("Billie Jean", "Michael Jackson", "4:54"));
-        listaMusicas.add(new Musica("Like a Rolling Stone", "Bob Dylan", "6:13"));
-        listaMusicas.add(new Musica("Smells Like Teen Spirit", "Nirvana", "5:01"));
+        listaMusicas.add(new Musica("Bohemian Rhapsody", "Queen", "5:55",null,null));
+        listaMusicas.add(new Musica("Hotel California", "Eagles", "6:30",null,null  ));
+        listaMusicas.add(new Musica("Stairway to Heaven", "Led Zeppelin", "8:02",null,null));
+        listaMusicas.add(new Musica("Imagine", "John Lennon", "3:03",null,null));
+        listaMusicas.add(new Musica("Sweet Child O' Mine", "Guns N' Roses", "5:03",null,null));
+        listaMusicas.add(new Musica("Billie Jean", "Michael Jackson", "4:54",null,null));
+        listaMusicas.add(new Musica("Like a Rolling Stone", "Bob Dylan", "6:13",null,null));
+        listaMusicas.add(new Musica("Smells Like Teen Spirit", "Nirvana", "5:01",null,null));
 
         // Notificar o adapter sobre as mudanças
-        musicaAdapter.notifyDataSetChanged();
     }
 
 

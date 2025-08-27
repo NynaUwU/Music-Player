@@ -15,6 +15,7 @@ import java.util.List;
 
 public class MusicaAdapter extends RecyclerView.Adapter<MusicaAdapter.MusicaViewHolder> {
 
+
     private List<Musica> listaMusicas;
     private Context context;
     private OnMusicaClickListener listener;

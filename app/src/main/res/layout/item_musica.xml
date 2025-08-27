@@ -2,6 +2,7 @@
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
@@ -14,19 +15,19 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="#7C535F"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="16dp"
-        android:gravity="center_vertical">
+        android:padding="16dp">
 
         <!-- Imagem da capa do álbum -->
         <ImageView
             android:id="@+id/iv_capa_album"
             android:layout_width="60dp"
             android:layout_height="60dp"
+            android:layout_marginEnd="16dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/album"
-            android:background="@drawable/cat"
-            android:layout_marginEnd="16dp" />
+            android:src="@drawable/album" />
 
         <!-- Informações da música -->
         <LinearLayout
@@ -39,32 +40,32 @@
                 android:id="@+id/tv_nome_musica"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Nome da Música"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="@android:color/black"
+                android:ellipsize="end"
                 android:maxLines="1"
-                android:ellipsize="end" />
+                android:text="Nome da Música"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tv_artista"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Nome do Artista"
-                android:textSize="14sp"
-                android:textColor="@android:color/darker_gray"
                 android:layout_marginTop="4dp"
+                android:ellipsize="end"
                 android:maxLines="1"
-                android:ellipsize="end" />
+                android:text="Nome do Artista"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/tv_duracao"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
                 android:text="3:45"
-                android:textSize="12sp"
                 android:textColor="@android:color/tertiary_text_dark"
-                android:layout_marginTop="2dp" />
+                android:textSize="12sp" />
 
         </LinearLayout>
 
@@ -73,9 +74,10 @@
             android:id="@+id/btn_opcoes"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:src="@drawable/cat"
-            android:background="?android:attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Opções da música" />
+            android:contentDescription="Opções da música"
+            android:scaleType="centerInside"
+            android:src="@drawable/menubut"
+            tools:src="@drawable/menubut" />
 
     </LinearLayout>
 
