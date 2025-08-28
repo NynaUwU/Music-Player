@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.wifi.p2p.WifiP2pGroup;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowInsets;
 import android.widget.ImageButton;
 import android.widget.PopupMenu;
 import android.widget.Toast;
@@ -14,6 +15,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.navigation.NavigationBarMenu;
+import com.google.android.material.navigation.NavigationView;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +25,8 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnMusicaClickListener {
     Context context;
 
+    private ImageButton sideMenuButton;
+    private NavigationView sideMenu;
     private RecyclerView recyclerView;
     private MusicaAdapter musicaAdapter;
     private List<Musica> listaMusicas;
@@ -28,20 +34,32 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         context=this;
         setContentView(R.layout.activity_main);
 
-        recyclerView = findViewById(R.id.recycler_view_musicas);
+        sideMenuButton = findViewById((R.id.sideMenuButton));
+        sideMenu = findViewById(R.id.navBarLateral);
 
+        recyclerView = findViewById(R.id.recycler_view_musicas);
         listaMusicas = new ArrayList<>();
         setupRecyclerView();
-
         carregarMusicas();
+
+        sideMenuButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(sideMenu.getVisibility()== NavigationView.VISIBLE){
+                    sideMenu.setVisibility(NavigationView.GONE);
+                }else {
+                    sideMenu.setVisibility(NavigationView.VISIBLE);
+                }
+
+            }
+        });
 
     }
 
-
+    //Recycler view stuff --->
     private void setupRecyclerView() {
             listaMusicas = new ArrayList<>();
             musicaAdapter = new MusicaAdapter(this, listaMusicas);

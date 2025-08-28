@@ -4,4 +4,7 @@
     <string name="allMusics">Todas musicas</string>
     <string name="Login">Login</string>
     <string name="onMusic">Musicas Online</string>
+    <string name="playlist">Playlists</string>
+    <string name="register">Registro</string>
+    <string name="account">Conta</string>
 </resources>

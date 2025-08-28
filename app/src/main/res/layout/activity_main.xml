@@ -6,22 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#000000"
+    app:barrierMargin="1dp"
     tools:context=".MainActivity">
-
-    <com.google.android.material.navigation.NavigationView
-        android:id="@+id/navBar"
-        android:layout_width="200dp"
-        android:layout_height="0dp"
-        android:layout_marginEnd="2dp"
-        android:layout_marginRight="2dp"
-        android:background="@color/md_theme_onSecondaryFixed"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/frameLayout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/frameLayout2"
-        app:menu="@menu/sidebar" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/frameLayout2"
@@ -39,6 +25,7 @@
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:background="#30111C"
+            android:tint="#878787"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -53,6 +40,7 @@
             android:layout_marginLeft="16dp"
             android:background="#00000000"
             android:scaleType="centerInside"
+            android:tint="#FF878787"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -72,12 +60,12 @@
 
         <ImageButton
             android:id="@+id/forwardButton"
-            style="@android:style/Widget.DeviceDefault.ImageButton"
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:background="@drawable/skip_next"
+            android:background="#00FFFFFF"
             android:scaleType="centerInside"
-            android:tint="#00FFFFFF"
+            android:src="@drawable/skip_next"
+            android:tint="#FF878787"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.954"
@@ -106,6 +94,7 @@
             android:layout_marginRight="8dp"
             android:background="#00FFFFFF"
             android:scaleType="centerInside"
+            android:tint="#FF878787"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/forwardButton"
             app:layout_constraintTop_toTopOf="parent"
@@ -119,6 +108,7 @@
             android:layout_marginRight="8dp"
             android:background="#00FFFFFF"
             android:scaleType="centerInside"
+            android:tint="#FF878787"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/playButton"
             app:layout_constraintTop_toTopOf="parent"
@@ -141,15 +131,35 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view_musicas"
-        android:layout_width="409dp"
-        android:layout_height="573dp"
-        android:layout_marginTop="2dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/frameLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/frameLayout2"
+        app:layout_constraintVertical_bias="0.0"
         app:reverseLayout="false"
-        tools:listitem="@layout/item_musica" />
+        tools:listitem="@layout/item_musica">
+
+    </androidx.recyclerview.widget.RecyclerView>
+
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/navBarLateral"
+        style="@style/SideBarStyle"
+        android:layout_width="200dp"
+        android:layout_height="0dp"
+        android:background="@color/md_theme_onSecondaryFixed"
+        android:visibility="gone"
+        app:itemBackground="@drawable/roundcornes"
+        app:itemTextAppearanceActiveBoldEnabled="true"
+        app:itemTextColor="#000000"
+        app:itemVerticalPadding="5dp"
+        app:layout_constraintBottom_toTopOf="@+id/frameLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/frameLayout2"
+        app:menu="@menu/sidebar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 

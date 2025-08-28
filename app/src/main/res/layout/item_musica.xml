@@ -74,6 +74,7 @@
             android:id="@+id/btn_opcoes"
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:background="#00FFFFFF"
             android:contentDescription="Opções da música"
             android:scaleType="centerInside"
             android:src="@drawable/menubut"
