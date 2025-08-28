@@ -1,6 +1,7 @@
 package com.example.musicplayer;
 
 import android.content.Context;
+import android.net.wifi.p2p.WifiP2pGroup;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
@@ -29,12 +30,13 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         context=this;
+        setContentView(R.layout.activity_main);
 
         recyclerView = findViewById(R.id.recycler_view_musicas);
 
         listaMusicas = new ArrayList<>();
         setupRecyclerView();
-        setContentView(R.layout.activity_main);
+
         carregarMusicas();
 
     }
@@ -44,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
             listaMusicas = new ArrayList<>();
             musicaAdapter = new MusicaAdapter(this, listaMusicas);
             musicaAdapter.setOnMusicaClickListener(this);
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
             recyclerView.setAdapter(musicaAdapter);
 
     }
