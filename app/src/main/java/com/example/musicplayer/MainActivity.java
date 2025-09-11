@@ -22,8 +22,11 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
     private ImageButton sideMenuButton;
     private NavigationView sideMenu;
     private RecyclerView recyclerView;
+
+    private AppDatabase db;
     private MusicaAdapter musicaAdapter;
     private List<Musica> listaMusicas;
+    private List<Musica> listaMusicasOnline;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +36,11 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
 
         sideMenuButton = findViewById((R.id.sideMenuButton));
         sideMenu = findViewById(R.id.navBarLateral);
+
+        db = Room.databaseBuilder(
+                getApplicationContext(),
+                AppDatabase.class,
+                "meu-banco").allowMainThreadQueries().build();
 
         recyclerView = findViewById(R.id.recycler_view_musicas);
         listaMusicas = new ArrayList<>();
