@@ -10,7 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.navigation.NavigationView;
-import androidx.room.Room;
+import androidx.room.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,15 +33,17 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
         super.onCreate(savedInstanceState);
         context=this;
         setContentView(R.layout.activity_main);
-
+        //Declarar botoes
         sideMenuButton = findViewById((R.id.sideMenuButton));
         sideMenu = findViewById(R.id.navBarLateral);
 
+        //Banco de dados
         db = Room.databaseBuilder(
                 getApplicationContext(),
                 AppDatabase.class,
                 "meu-banco").allowMainThreadQueries().build();
 
+        //Musicas
         recyclerView = findViewById(R.id.recycler_view_musicas);
         listaMusicas = new ArrayList<>();
         setupRecyclerView();
@@ -97,6 +99,8 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
 
     public void onOpcoesClick(Musica musica, int position, View view) {
         // Mostrar menu popup com opções
+
+
         PopupMenu popup = new PopupMenu(this, view);
         popup.getMenuInflater().inflate(R.menu.menu_opcoes_musica, popup.getMenu());
 

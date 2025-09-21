@@ -1,10 +1,9 @@
 package com.example.musicplayer;
 
-import androidx.room.Database;
-import androidx.room.RoomDatabase;
+import androidx.room.*;
 
-@database(entities = {Musica.class}, version=1)
-public abstract class AppDatabase extends RoomDataBase {
+@database (entities = {Musica.class}, version=1)
+public abstract class AppDatabase extends RoomDatabase {
 
     public abstract MusicDao musicDao();
 

@@ -1,8 +1,7 @@
 package com.example.musicplayer;
 
-import androidx.room.Dao;
-import androidx.room.Import;
-import androidx.room.Query;
+import androidx.room.*;
+
 
 import java.util.List;
 

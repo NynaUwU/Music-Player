@@ -123,9 +123,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:layout_marginLeft="4dp"
             android:text="music template"
-            android:textColor="@color/md_theme_background_highContrast"
+            android:textColor="@color/md_theme_onPrimaryContainer_mediumContrast"
             android:textSize="10sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/imageView3"
@@ -172,14 +171,14 @@
         android:visibility="gone"
         app:itemBackground="@drawable/roundcornes"
         app:itemTextAppearanceActiveBoldEnabled="true"
-        app:itemTextColor="#000000"
-        app:itemVerticalPadding="5dp"
+        app:itemTextColor="@color/md_theme_onBackground"
         app:layout_constraintBottom_toTopOf="@+id/frameLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/frameLayout2"
-        app:menu="@menu/sidebar" />
+        app:menu="@menu/sidebar"
+        app:subheaderInsetEnd="28dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 
