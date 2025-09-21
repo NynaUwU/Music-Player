@@ -4,11 +4,9 @@
 
     <item
         android:id="@+id/UploadBTN"
-        android:icon="@drawable/cloud_upload"
         android:title="Upload" />
     <item
         android:id="@+id/DownloadBTN"
-        android:icon="@drawable/cloud_download"
         android:title="Download" />
     <item
         android:id="@+id/action_adicionar_playlist"
