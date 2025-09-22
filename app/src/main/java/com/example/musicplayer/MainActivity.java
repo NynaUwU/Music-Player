@@ -105,7 +105,9 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
 
         for (String folder : mp3Folders) {
             Log.d("MP3Folders", "Pasta encontrada: " + folder);
-            listaMusicas.add(new Musica(folder, "Queen", "5:55", null, null));
+            List<String> temp = MP3Scanner.scanMp3Files(folder,false);
+            listaMusicas.add(new Musica(false, folder.substring(folder.lastIndexOf('/')+1), folder, String.valueOf(temp.size())));
+
             listaPastasMusica.add(folder);
         }
 

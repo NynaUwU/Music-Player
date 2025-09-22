@@ -5,6 +5,7 @@ public class Musica {
     private String duracao;
     private String capaAlbum; // URL ou caminho da imagem
     private String arquivo; // Caminho do arquivo de áudio
+    private boolean isMusic = true;
 
     // Construtor
     public Musica(String nome, String artista, String duracao, String capaAlbum, String arquivo) {
@@ -22,6 +23,15 @@ public class Musica {
         this.duracao = duracao;
         this.capaAlbum = "";
         this.arquivo = "";
+    }
+
+    public Musica(boolean isMusic ,String nome,String arquivo, String QuantMP3) {
+        this.isMusic = isMusic;
+        this.nome = nome;
+        this.artista = arquivo;
+        this.duracao = QuantMP3+" Musicas";
+        this.capaAlbum = "";
+        this.arquivo = arquivo;
     }
 
     // Getters e Setters
@@ -64,4 +74,8 @@ public class Musica {
     public void setArquivo(String arquivo) {
         this.arquivo = arquivo;
     }
+
+    public boolean isMusic() {return isMusic;}
+
+    public void setMusic(boolean music) {isMusic = music;}
 }
