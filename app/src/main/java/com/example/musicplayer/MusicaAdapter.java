@@ -66,7 +66,7 @@ public class MusicaAdapter extends RecyclerView.Adapter<MusicaAdapter.MusicaView
             if(musica.isMusic()){
             holder.ivCapaAlbum.setImageResource(R.drawable.album);
             }else{
-                holder.ivCapaAlbum.setImageResource(R.drawable.cat);
+                holder.ivCapaAlbum.setImageResource(R.drawable.folder);
             }
         }
 

@@ -24,13 +24,13 @@ public class AppDatabase {
     }
 
     // TODO: Métodos que se comunicam com o servidor
-    public Usuario usuarioLogin() {
+    public Usuario usuarioLogin(Usuario user) {
         try {
             out.writeObject("UsuarioLogin");
             in.readObject(); // lendo o "OK"
-            out.writeObject("aaaaa");
+            out.writeObject(user);
             Usuario userLogado = (Usuario) in.readObject();
-            return null;
+            return userLogado;
         } catch (Exception e) {
             e.printStackTrace();
             return null;

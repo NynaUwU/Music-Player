@@ -2,7 +2,9 @@ package com.example.musicplayer;
 
 import android.graphics.Bitmap;
 
-public class Musica {
+import java.io.Serializable;
+
+public class Musica implements Serializable {
     private String nome;
     private String artista;
     private String duracao;
