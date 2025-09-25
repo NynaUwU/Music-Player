@@ -1,9 +1,10 @@
 package com.example.musicplayer;
 
+import android.util.Log;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import android.util.Log;
 
 public class MP3Scanner {
     
@@ -64,7 +65,7 @@ public class MP3Scanner {
             try {
                 if (file.isFile() && isMp3File(file)) {
                     mp3Files.add(file.getAbsolutePath());
-                    Log.d(TAG, "MP3 encontrado: " + file.getAbsolutePath());
+                    //Log.d(TAG, "MP3 encontrado: " + file.getAbsolutePath());
                 } else if (file.isDirectory() && recursive) {
                     scanFolder(file, mp3Files, recursive);
                 }
@@ -162,7 +163,7 @@ public class MP3Scanner {
                         file.lastModified()
                     );
                     mp3InfoList.add(info);
-                    Log.d(TAG, "MP3 detalhado: " + info.toString());
+                    //Log.d(TAG, "MP3 detalhado: " + info.toString());
                 } else if (file.isDirectory() && recursive) {
                     scanFolderDetailed(file, mp3InfoList, recursive);
                 }
@@ -180,46 +181,8 @@ public class MP3Scanner {
     public static void printMp3Files(String folderPath, boolean recursive) {
         List<String> mp3Files = scanMp3Files(folderPath, recursive);
         
-        System.out.println("\n=== ARQUIVOS MP3 ENCONTRADOS ===");
-        System.out.println("Pasta: " + folderPath);
-        System.out.println("Busca recursiva: " + (recursive ? "Sim" : "Não"));
-        System.out.println("Total de arquivos: " + mp3Files.size());
-        System.out.println("================================\n");
-        
         if (mp3Files.isEmpty()) {
             System.out.println("Nenhum arquivo MP3 encontrado.");
-        } else {
-            for (int i = 0; i < mp3Files.size(); i++) {
-                System.out.println((i + 1) + ". " + mp3Files.get(i));
-            }
         }
-        
-        System.out.println("\n================================");
-    }
-    
-    // Exemplo de uso
-    public static void exemploDeUso() {
-        // Exemplo 1: Busca simples (apenas na pasta indicada)
-        String pastaMusicas = "/storage/emulated/0/Music";
-        List<String> mp3s = scanMp3Files(pastaMusicas, false);
-        
-        System.out.println("MP3s encontrados na pasta Music:");
-        for (String mp3 : mp3s) {
-            System.out.println(mp3);
-        }
-        
-        // Exemplo 2: Busca recursiva (incluindo subpastas)
-        List<String> todosMp3s = scanMp3Files(pastaMusicas, true);
-        
-        // Exemplo 3: Busca com informações detalhadas
-        List<Mp3Info> mp3sDetalhados = scanMp3FilesDetailed(pastaMusicas, true);
-        
-        System.out.println("\nMP3s com detalhes:");
-        for (Mp3Info info : mp3sDetalhados) {
-            System.out.println(info.toString());
-        }
-        
-        // Exemplo 4: Usando o método de conveniência
-        printMp3Files(pastaMusicas, true);
     }
 }

@@ -15,22 +15,25 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.musicplayer.database.AppDatabase;
+import com.example.musicplayer.database.Usuario;
 import com.example.yourapp.MP3FolderScanner;
 import com.google.android.material.navigation.NavigationView;
 
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnMusicaClickListener {
+    private static AppDatabase ccont;
     Context context;
     private StoragePermissionHelper permissionHelper;
-
     private ImageButton sideMenuButton;
     private NavigationView sideMenu;
     private RecyclerView recyclerView;
-
-    private AppDatabase db;
     private MediaMetadataRetriever mp3Info = new MediaMetadataRetriever();
     private MusicaAdapter musicaAdapter;
     private List<Musica> listaMusicas;
@@ -65,6 +68,28 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
         });
 
         //Banco de dados
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Socket cliente = new Socket("192.168.56.1", 12345);
+                    ObjectOutputStream out = new ObjectOutputStream(cliente.getOutputStream());
+                    ObjectInputStream in = new ObjectInputStream(cliente.getInputStream());
+                    ccont = new AppDatabase(out, in);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
+        try {
+            Usuario user = new Usuario("abc", "123");
+            ccont.usuarioLogin();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
 
         //Musicas
         recyclerView = findViewById(R.id.recycler_view_musicas);
@@ -166,9 +191,11 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
                 long minutos = (milliseconds / 1000) / 60;
                 long seconds = (milliseconds / 1000) % 60;
                 String duracao = minutos + ":";
-                if (String.valueOf(seconds).length()==1){
-                    duracao = duracao+"0"+seconds;
-                }else {duracao+=seconds;}
+                if (String.valueOf(seconds).length() == 1) {
+                    duracao = duracao + "0" + seconds;
+                } else {
+                    duracao += seconds;
+                }
 
                 if (albumArtBytes != null) {
                     Bitmap albumArt = BitmapFactory.decodeByteArray(albumArtBytes, 0, albumArtBytes.length);

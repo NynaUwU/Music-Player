@@ -50,7 +50,7 @@ public class MP3FolderScanner {
             if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
                 File externalStorage = Environment.getExternalStorageDirectory();
                 if (externalStorage != null && externalStorage.exists()) {
-                    Log.d(TAG, "Iniciando scan no armazenamento externo: " + externalStorage.getAbsolutePath());
+                    //Log.d(TAG, "Iniciando scan no armazenamento externo: " + externalStorage.getAbsolutePath());
                     scanDirectory(externalStorage);
                 }
             }
@@ -106,7 +106,7 @@ public class MP3FolderScanner {
                 String dirPath = directory.getAbsolutePath();
                 if (!mp3Directories.contains(dirPath)) {
                     mp3Directories.add(dirPath);
-                    Log.d(TAG, "Pasta com MP3 encontrada: " + dirPath);
+                    //Log.d(TAG, "Pasta com MP3 encontrada: " + dirPath);
                 }
             }
 

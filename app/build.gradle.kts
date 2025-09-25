@@ -41,6 +41,7 @@ dependencies {
     implementation(libs.recyclerview)
     implementation(libs.room.common.jvm)
     implementation(libs.room.runtime.android)
+    implementation(files("C:\\Users\\posse\\Downloads\\mysql-connector-j-9.4.0.jar"))
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
