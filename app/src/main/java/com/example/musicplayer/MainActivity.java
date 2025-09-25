@@ -1,6 +1,9 @@
 package com.example.musicplayer;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -11,10 +14,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.room.Room;
 
 import com.example.yourapp.MP3FolderScanner;
-
 import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
@@ -30,6 +31,7 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
     private RecyclerView recyclerView;
 
     private AppDatabase db;
+    private MediaMetadataRetriever mp3Info = new MediaMetadataRetriever();
     private MusicaAdapter musicaAdapter;
     private List<Musica> listaMusicas;
     private List<Musica> listaMusicasOnline;
@@ -69,7 +71,7 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
         listaMusicas = new ArrayList<>();
         listaPastasMusica = new ArrayList<>();
         setupRecyclerView();
-        carregarMusicas();
+        carregarMusicas(null);
 
         sideMenuButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,20 +97,102 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
 
     }
 
-    private void carregarMusicas() {
+    private void carregarMusicas(String folderToLoad) {
         // Dados de exemplo - substitua pela sua fonte de dados
 
-        MP3FolderScanner scanner = new MP3FolderScanner(context);
-        List<String> mp3Folders = scanner.scanForMP3Folders();
+        List<String> mp3Folders = new ArrayList<>();
 
-        // Os diretórios ficam disponíveis na lista
+        if (folderToLoad == null) {
+            MP3FolderScanner scanner = new MP3FolderScanner(context);
+            mp3Folders = scanner.scanForMP3Folders();
 
-        for (String folder : mp3Folders) {
-            Log.d("MP3Folders", "Pasta encontrada: " + folder);
-            List<String> temp = MP3Scanner.scanMp3Files(folder,false);
-            listaMusicas.add(new Musica(false, folder.substring(folder.lastIndexOf('/')+1), folder, String.valueOf(temp.size())));
+            // Os diretórios ficam disponíveis na lista
 
-            listaPastasMusica.add(folder);
+            for (String folder : mp3Folders) {
+                Log.d("MP3Folders", "Pasta encontrada: " + folder);
+                List<String> temp = MP3Scanner.scanMp3Files(folder, false);
+                listaMusicas.add(new Musica(false, folder.substring(folder.lastIndexOf('/') + 1), folder, String.valueOf(temp.size())));
+                listaPastasMusica.add(folder);
+            }
+        } else {
+
+            listaMusicas.clear();
+
+            mp3Folders = MP3Scanner.scanMp3Files(folderToLoad, false);
+
+            //Carregar MP3's
+
+            for (String folder : mp3Folders) {
+                Log.d("MP3 Scanner", "MP3's encontrado: " + folder);
+                mp3Info.setDataSource(folder);
+
+                //Organizar informações
+
+                //get title
+                String title;
+                if (mp3Info.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE) == null) {
+                    title = folder.substring(folder.lastIndexOf('/') + 1);
+                } else {
+                    title = mp3Info.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+                }
+
+                //GET SONG IMAGE
+                byte[] albumArtBytes = mp3Info.getEmbeddedPicture();
+
+                // author/artista
+                String author;
+
+                //Se n ouver author, usa o compositor
+                if (mp3Info.extractMetadata(MediaMetadataRetriever.METADATA_KEY_AUTHOR) == null) {
+                    if (mp3Info.extractMetadata(MediaMetadataRetriever.METADATA_KEY_COMPOSER) == null) {
+                        if (mp3Info.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST) == null) {
+                            if (mp3Info.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST) == null) {
+                                author = "Desconhecido";
+                            } else {
+                                author = mp3Info.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST);
+                            }
+                        } else {
+                            author = mp3Info.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
+                        }
+                    } else {
+                        author = mp3Info.extractMetadata(MediaMetadataRetriever.METADATA_KEY_COMPOSER);
+                    }
+                } else {
+                    author = mp3Info.extractMetadata(MediaMetadataRetriever.METADATA_KEY_AUTHOR);
+                }
+
+                //formatação do tempo
+                long milliseconds = Long.parseLong(mp3Info.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION));
+                long minutos = (milliseconds / 1000) / 60;
+                long seconds = (milliseconds / 1000) % 60;
+                String duracao = minutos + ":";
+                if (String.valueOf(seconds).length()==1){
+                    duracao = duracao+"0"+seconds;
+                }else {duracao+=seconds;}
+
+                if (albumArtBytes != null) {
+                    Bitmap albumArt = BitmapFactory.decodeByteArray(albumArtBytes, 0, albumArtBytes.length);
+                    //add Song
+                    listaMusicas.add(new Musica(
+                            title,
+                            author,
+                            duracao,
+                            folder,
+                            albumArt
+                    ));
+
+                } else {
+                    //add song
+                    listaMusicas.add(new Musica(
+                            title,
+                            author,
+                            duracao,
+                            folder
+                    ));
+                }
+
+
+            }
         }
 
 
@@ -123,11 +207,23 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
 
         // Notificar o adapter sobre as mudanças
         //musicaAdapter.notifyDataSetChanged();
+
+        musicaAdapter.updateList(listaMusicas);
     }
 
 
     public void onMusicaClick(Musica musica, int position) {
         // Ação quando o card da música é clicado
+
+
+        if (musica.isMusic()) {
+            Toast.makeText(this, "Tocando: " + musica.getNome(), Toast.LENGTH_SHORT).show();
+        } else {
+            carregarMusicas(musica.getArquivo());
+            Toast.makeText(this, "indo para: " + musica.getNome(), Toast.LENGTH_SHORT).show();
+
+        }
+
         Toast.makeText(this, "Tocando: " + musica.getNome(), Toast.LENGTH_SHORT).show();
 
         // Aqui você pode implementar a lógica para tocar a música

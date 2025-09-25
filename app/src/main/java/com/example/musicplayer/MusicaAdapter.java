@@ -57,11 +57,17 @@ public class MusicaAdapter extends RecyclerView.Adapter<MusicaAdapter.MusicaView
         holder.tvDuracao.setText(musica.getDuracao());
 
         // Carregar imagem da capa (usando Glide ou Picasso se necessário)
-        if (musica.getCapaAlbum() != null && !musica.getCapaAlbum().isEmpty()) {
+        if (musica.getCapaAlbum() != null) {
             // Aqui você pode usar Glide ou Picasso para carregar a imagem
             // Glide.with(context).load(musica.getCapaAlbum()).into(holder.ivCapaAlbum);
+            holder.ivCapaAlbum.setImageBitmap(musica.getCapaAlbum());
+
         } else {
+            if(musica.isMusic()){
             holder.ivCapaAlbum.setImageResource(R.drawable.album);
+            }else{
+                holder.ivCapaAlbum.setImageResource(R.drawable.cat);
+            }
         }
 
         // Click listeners

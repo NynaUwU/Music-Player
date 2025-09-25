@@ -1,14 +1,17 @@
 package com.example.musicplayer;
+
+import android.graphics.Bitmap;
+
 public class Musica {
     private String nome;
     private String artista;
     private String duracao;
-    private String capaAlbum; // URL ou caminho da imagem
+    private Bitmap capaAlbum; // URL ou caminho da imagem
     private String arquivo; // Caminho do arquivo de áudio
     private boolean isMusic = true;
 
     // Construtor
-    public Musica(String nome, String artista, String duracao, String capaAlbum, String arquivo) {
+    public Musica(String nome, String artista, String duracao, String arquivo, Bitmap capaAlbum) {
         this.nome = nome;
         this.artista = artista;
         this.duracao = duracao;
@@ -17,12 +20,12 @@ public class Musica {
     }
 
     // Construtor simples
-    public Musica(String nome, String artista, String duracao) {
+    public Musica(String nome, String artista, String duracao, String arquivo) {
         this.nome = nome;
         this.artista = artista;
         this.duracao = duracao;
-        this.capaAlbum = "";
-        this.arquivo = "";
+        this.capaAlbum = null;
+        this.arquivo = arquivo;
     }
 
     public Musica(boolean isMusic ,String nome,String arquivo, String QuantMP3) {
@@ -30,7 +33,7 @@ public class Musica {
         this.nome = nome;
         this.artista = arquivo;
         this.duracao = QuantMP3+" Musicas";
-        this.capaAlbum = "";
+        this.capaAlbum = null;
         this.arquivo = arquivo;
     }
 
@@ -59,11 +62,11 @@ public class Musica {
         this.duracao = duracao;
     }
 
-    public String getCapaAlbum() {
+    public Bitmap getCapaAlbum() {
         return capaAlbum;
     }
 
-    public void setCapaAlbum(String capaAlbum) {
+    public void setCapaAlbum(Bitmap capaAlbum) {
         this.capaAlbum = capaAlbum;
     }
 
