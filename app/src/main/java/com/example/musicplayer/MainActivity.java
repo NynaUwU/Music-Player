@@ -1,18 +1,19 @@
 package com.example.musicplayer;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.PopupMenu;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -35,7 +36,6 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnMusicaClickListener {
     private static AppDatabase ccont;
     Context context;
-    private View musicViewer;
     private StoragePermissionHelper permissionHelper;
     private ImageButton sideMenuButton;
     private ConstraintLayout FLbotton;
@@ -47,8 +47,10 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
     private List<Musica> listaMusicas;
     private List<Musica> listaMusicasOnline;
     private List<Musica> listaPastasMusica;
-    private Musica PlayingNow;
-    private int WhereAreWe = 0;
+    public static Musica PlayingNow;
+    private String WhereAreWe = null;
+    Intent intent;
+
 
 
     @Override
@@ -56,13 +58,18 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
         super.onCreate(savedInstanceState);
         context = this;
         setContentView(R.layout.activity_main);
+
+        intent = new Intent(context, musicView.class);
+
         //Declarar botoes
         sideMenuButton = findViewById((R.id.sideMenuButton));
         FLbotton = findViewById(R.id.FLbotton);
         sideMenu = findViewById(R.id.navBarLateral);
+        sideMenu.setNavigationItemSelectedListener(this::onNavigationItemSelected);
 
         permissionHelper = new StoragePermissionHelper(this);
         playlistManager = new PlaylistManager(context);
+
 
         // Solicita permissão para armazenamento
         permissionHelper.requestStoragePermission(new StoragePermissionHelper.PermissionCallback() {
@@ -78,6 +85,9 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
                 //Toast.makeText(MainActivity.this, "Permissão negada. Não é possível acessar arquivos.", Toast.LENGTH_LONG).show();
             }
         });
+
+
+
 
         //Banco de dados
         new Thread(new Runnable() {
@@ -115,10 +125,8 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
             @Override
             public void onClick(View v) {
                 if (sideMenu.getVisibility() == NavigationView.VISIBLE) {
-                    WhereAreWe =0;
                     sideMenu.setVisibility(NavigationView.GONE);
                 } else {
-                    WhereAreWe = 1;
                     sideMenu.setVisibility(NavigationView.VISIBLE);
                 }
 
@@ -128,10 +136,11 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
         FLbotton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setContentView(R.layout.music_viewer);
-                WhereAreWe = 69;
+                startActivity(intent);
             }
         });
+
+
 
     }
 
@@ -142,7 +151,25 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
         musicaAdapter.setOnMusicaClickListener(this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(musicaAdapter);
+    }
 
+
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.RefreshButton) {
+            // Handle home item click
+            carregarMusicas(WhereAreWe,true);
+        } else if (id == R.id.foldersButton) {
+            // Handle settings item click
+            WhereAreWe=null;
+            carregarMusicas(WhereAreWe,false);
+        }
+
+
+        sideMenu.setVisibility(View.GONE); // Close the drawer after selection
+        return true;
     }
 
     private void carregarMusicas(String folderToLoad, boolean refresh) {
@@ -281,21 +308,11 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
 
         if (musica.isMusic()) {
             Toast.makeText(this, "Tocando: " + musica.getNome(), Toast.LENGTH_SHORT).show();
+
             PlayingNow = musica;
-            setContentView(R.layout.music_viewer);
-
-            ImageView AlbumCoverPlaying2 = findViewById(R.id.AlbumCoverPlaying2);
-            TextView MusicPlaying2 = findViewById(R.id.MusicPlaying2);
-            TextView artistPlaying2 = findViewById(R.id.artistPlaying2);
-            if (PlayingNow != null ){
-
-                AlbumCoverPlaying2.setImageBitmap(PlayingNow.getCapaAlbum());
-                MusicPlaying2.setText(PlayingNow.getNome());
-                artistPlaying2.setText(PlayingNow.getArtista());
-            }
-
         } else {
             carregarMusicas(musica.getArquivo(), false);
+            WhereAreWe = musica.getArquivo();
             Toast.makeText(this, "indo para: " + musica.getNome(), Toast.LENGTH_SHORT).show();
         }
 
@@ -343,4 +360,5 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
             Toast.makeText(this, "Removido: " + nomeMusica, Toast.LENGTH_SHORT).show();
         }
     }
+
 }

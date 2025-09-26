@@ -29,19 +29,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/cat" />
 
-        <ImageButton
-            android:id="@+id/sideMenuButton"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginLeft="16dp"
-            android:background="#00000000"
-            android:scaleType="centerInside"
-            android:tint="#FF878787"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/menubut" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ImageView
@@ -52,6 +39,7 @@
         android:layout_marginTop="24dp"
         android:layout_marginEnd="24dp"
         android:background="#FF878787"
+        android:foregroundGravity="fill_horizontal|center|fill_vertical"
         app:layout_constraintDimensionRatio="w,1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -239,4 +227,5 @@
         app:layout_constraintTop_toBottomOf="@+id/button3">
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

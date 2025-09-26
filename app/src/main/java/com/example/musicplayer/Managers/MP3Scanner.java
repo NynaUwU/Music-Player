@@ -149,10 +149,11 @@ public class MP3Scanner {
      * Método recursivo para examinar pastas e coletar informações detalhadas
      */
     private static void scanFolderDetailed(File folder, List<Mp3Info> mp3InfoList, boolean recursive) {
+
         File[] files = folder.listFiles();
-        
+
         if (files == null) return;
-        
+
         for (File file : files) {
             try {
                 if (file.isFile() && isMp3File(file)) {

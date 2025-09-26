@@ -22,6 +22,8 @@ public class MusicaAdapter extends RecyclerView.Adapter<MusicaAdapter.MusicaView
 
     // Interface para cliques nos itens
     public interface OnMusicaClickListener {
+
+
         void onMusicaClick(Musica musica, int position);
         void onOpcoesClick(Musica musica, int position, View view);
     }

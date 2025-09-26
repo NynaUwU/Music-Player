@@ -22,9 +22,8 @@
         android:theme="@style/Theme.MusicPlayer"
         tools:targetApi="31">
         <activity
-            android:name=".musicViewer"
-            android:exported="false"
-            android:theme="@style/Theme.MusicPlayer" />
+            android:name=".musicView"
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="true">
