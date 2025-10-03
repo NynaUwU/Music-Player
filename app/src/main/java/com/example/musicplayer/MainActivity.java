@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
             @Override
             public void onPermissionDenied() {
                 // Permissão negada
-                //Toast.makeText(MainActivity.this, "Permissão negada. Não é possível acessar arquivos.", Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, "Permissão negada. Não é possível acessar arquivos.", Toast.LENGTH_LONG).show();
             }
         });
 
@@ -120,6 +120,9 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
 
         setupRecyclerView();
         carregarMusicas(null, false);
+        recyclerView.setItemViewCacheSize(20);
+        recyclerView.setDrawingCacheEnabled(true);
+        recyclerView.setDrawingCacheQuality(NavigationView.DRAWING_CACHE_QUALITY_HIGH);
 
         sideMenuButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -178,7 +181,7 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
         List<String> mp3Folders = new ArrayList<>();
 
         if (folderToLoad == null) {
-            if (playlistManager.playlistExists("Folders")&& !refresh) {
+            if (playlistManager.playlistExists("Folders") && !refresh) {
                 listaPastasMusica.clear();
                 listaPastasMusica = playlistManager.loadPlaylist("Folders");
                 listaMusicas.clear();
@@ -202,7 +205,7 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
                 playlistManager.savePlaylist("Folders", listaPastasMusica);
             }
         } else {
-            listarMP3(folderToLoad, false);
+            listarMP3(folderToLoad, refresh);
         }
 
         musicaAdapter.updateList(listaMusicas);
@@ -210,7 +213,7 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
 
     private void listarMP3(String folderToLoad, boolean refresh) {
 
-        if (!refresh && playlistManager.playlistExists(folderToLoad.replaceAll("/",""))) {
+        if (playlistManager.playlistExists(folderToLoad.replaceAll("/","")) && !refresh) {
             listaMusicas.clear();
             listaMusicas = playlistManager.loadPlaylist(folderToLoad.replaceAll("/",""));
 
@@ -221,6 +224,7 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
             mp3Folders = MP3Scanner.scanMp3Files(folderToLoad, false);
 
             //Carregar MP3's
+
 
             for (String folder : mp3Folders) {
                 Log.d("MP3 Scanner", "MP3's encontrado: " + folder);
@@ -283,6 +287,7 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
                             albumArt
                     );
                     listaMusicas.add(tempM);
+
                 } else {
                     //add song
                     Musica tempM = new Musica(
@@ -295,9 +300,8 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
                     listaMusicas.add(tempM);
                 }
 
-                playlistManager.savePlaylist(folderToLoad.replaceAll("/",""),listaMusicas);
-
             }
+            playlistManager.savePlaylist(folderToLoad.replaceAll("/",""),listaMusicas);
         }
     }
 
@@ -311,8 +315,8 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
 
             PlayingNow = musica;
         } else {
-            carregarMusicas(musica.getArquivo(), false);
             WhereAreWe = musica.getArquivo();
+            carregarMusicas(musica.getArquivo(), false);
             Toast.makeText(this, "indo para: " + musica.getNome(), Toast.LENGTH_SHORT).show();
         }
 

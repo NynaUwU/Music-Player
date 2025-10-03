@@ -49,6 +49,7 @@ public class PlaylistManager {
      * @return true se salvou com sucesso, false caso contrário
      */
     public boolean savePlaylist(String fileName, List<Musica> musicList) {
+        fileName= cleanFileName(fileName);
         if (fileName == null || fileName.trim().isEmpty()) {
             Log.e(TAG, "Nome do arquivo não pode ser vazio");
             return false;
@@ -97,6 +98,7 @@ public class PlaylistManager {
      * @return Lista de objetos Musica, ou null se erro
      */
     public List<Musica> loadPlaylist(String fileName) {
+        fileName= cleanFileName(fileName);
         if (fileName == null || fileName.trim().isEmpty()) {
             Log.e(TAG, "Nome do arquivo não pode ser vazio");
             return null;
@@ -150,6 +152,7 @@ public class PlaylistManager {
      * @return Lista com nomes dos arquivos (sem extensão), ou lista vazia se nenhum
      */
     public List<String> getAllPlaylistNames() {
+
         List<String> playlistNames = new ArrayList<>();
 
         File[] files = playlistsDir.listFiles(new FilenameFilter() {
@@ -183,6 +186,7 @@ public class PlaylistManager {
      * @return true se deletou com sucesso, false caso contrário
      */
     public boolean deletePlaylist(String fileName) {
+        fileName= cleanFileName(fileName);
         if (fileName == null || fileName.trim().isEmpty()) {
             Log.e(TAG, "Nome do arquivo não pode ser vazio");
             return false;
@@ -213,6 +217,8 @@ public class PlaylistManager {
      * @return true se existe, false caso contrário
      */
     public boolean playlistExists(String fileName) {
+        fileName= cleanFileName(fileName);
+
         if (fileName == null || fileName.trim().isEmpty()) {
             return false;
         }
@@ -220,7 +226,7 @@ public class PlaylistManager {
         String fullFileName = fileName.endsWith(FILE_EXTENSION) ?
                 fileName : fileName + FILE_EXTENSION;
 
-        File file = new File(playlistsDir, fullFileName);
+        File file = new File(playlistsDir, cleanFileName(fullFileName));
         return file.exists();
     }
 
@@ -231,6 +237,8 @@ public class PlaylistManager {
      * @return true se renomeou com sucesso, false caso contrário
      */
     public boolean renamePlaylist(String oldName, String newName) {
+        oldName= cleanFileName(oldName);
+
         if (oldName == null || oldName.trim().isEmpty() ||
                 newName == null || newName.trim().isEmpty()) {
             Log.e(TAG, "Nomes não podem ser vazios");
@@ -270,6 +278,7 @@ public class PlaylistManager {
      * @return PlaylistInfo com dados da playlist, ou null se erro
      */
     public PlaylistInfo getPlaylistInfo(String fileName) {
+        fileName= cleanFileName(fileName);
         if (fileName == null || fileName.trim().isEmpty()) {
             return null;
         }
@@ -311,6 +320,8 @@ public class PlaylistManager {
      * @return PlaylistInfo detalhado
      */
     public PlaylistInfo getDetailedPlaylistInfo(String fileName) {
+        fileName= cleanFileName(fileName);
+
         List<Musica> musicas = loadPlaylist(fileName);
         if (musicas == null) {
             return null;
@@ -345,6 +356,7 @@ public class PlaylistManager {
      * @return true se adicionou com sucesso
      */
     public boolean addMusicToPlaylist(String fileName, Musica musica) {
+        fileName= cleanFileName(fileName);
         List<Musica> playlist = loadPlaylist(fileName);
         if (playlist == null) {
             playlist = new ArrayList<>();
@@ -361,6 +373,7 @@ public class PlaylistManager {
      * @return true se removeu com sucesso
      */
     public boolean removeMusicFromPlaylist(String fileName, int index) {
+        fileName= cleanFileName(fileName);
         List<Musica> playlist = loadPlaylist(fileName);
         if (playlist == null || index < 0 || index >= playlist.size()) {
             return false;
@@ -474,11 +487,14 @@ public class PlaylistManager {
      * Remove caracteres inválidos do nome do arquivo
      */
     private String cleanFileName(String fileName) {
-        return fileName.trim()
-                .replaceAll("[\\\\/:*?\"<>|]", "_")
-                .replaceAll("\\s+", "_");
+        if (fileName == null) {
+            return null;
+        } else {
+            return fileName.trim()
+                    .replaceAll("[\\\\/:*?\"<>|]", "_")
+                    .replaceAll("\\s+", "_");
+        }
     }
-
     /**
      * Classe para informações da playlist
      */

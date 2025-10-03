@@ -4,11 +4,11 @@ plugins {
 
 android {
     namespace = "com.example.musicplayer"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.musicplayer"
-        minSdk = 21
+        minSdk = 23
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -32,6 +32,7 @@ android {
     buildFeatures {
         viewBinding = true
     }
+    buildToolsVersion = "36.1.0"
 }
 
 dependencies {
@@ -47,8 +48,10 @@ dependencies {
     implementation(files("C:\\Users\\posse\\Downloads\\mysql-connector-j-9.4.0.jar"))
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
+    implementation(libs.github.glide)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+
     //implementation()
 }

@@ -7,8 +7,11 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,12 +64,12 @@ public class MusicaAdapter extends RecyclerView.Adapter<MusicaAdapter.MusicaView
         // Carregar imagem da capa (usando Glide ou Picasso se necessário)
         if (musica.getCapaAlbum() != null) {
             // Aqui você pode usar Glide ou Picasso para carregar a imagem
-            // Glide.with(context).load(musica.getCapaAlbum()).into(holder.ivCapaAlbum);
-            holder.ivCapaAlbum.setImageBitmap(musica.getCapaAlbum());
+            Glide.with(context).load(musica.getCapaAlbum()).into(holder.ivCapaAlbum);
 
         } else {
             if(musica.isMusic()){
-            holder.ivCapaAlbum.setImageResource(R.drawable.album);
+            //holder.ivCapaAlbum.setImageResource(R.drawable.album);
+            holder.ivCapaAlbum.setImageResource(R.drawable.folder);
             }else{
                 holder.ivCapaAlbum.setImageResource(R.drawable.folder);
             }
