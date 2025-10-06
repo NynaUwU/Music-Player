@@ -33,7 +33,7 @@ public class MusicaAdapter extends RecyclerView.Adapter<MusicaAdapter.MusicaView
 
     public MusicaAdapter(Context context, List<Musica> listaMusicas) {
         glideOptions = new RequestOptions()
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .diskCacheStrategy(DiskCacheStrategy.DATA)
                 .centerCrop()
                 .placeholder(R.drawable.album)
                 .error(R.drawable.album);
@@ -85,6 +85,7 @@ public class MusicaAdapter extends RecyclerView.Adapter<MusicaAdapter.MusicaView
                     .apply(glideOptions)
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(holder.ivCapaAlbum);
+
             Glide.with(context).load(albumArt).into(holder.ivCapaAlbum);
 
             //holder.ivCapaAlbum.setImageResource(R.drawable.album);

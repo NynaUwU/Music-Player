@@ -26,11 +26,12 @@ public class musicView extends AppCompatActivity {
         TextView artistPlaying2 = findViewById(R.id.artistPlaying2);
         if (MainActivity.PlayingNow != null ){
             if (MainActivity.PlayingNow.getCapaAlbum()) {
+                mp3Info.setDataSource(MainActivity.PlayingNow.getArquivo());
+
                 byte[] albumArtBytes = mp3Info.getEmbeddedPicture();
                 Bitmap albumArt = null;
                 if (albumArtBytes != null) {
                     albumArt = BitmapFactory.decodeByteArray(albumArtBytes, 0, albumArtBytes.length);
-                    albumArt = Bitmap.createScaledBitmap(albumArt, 600, 600, true);
                     AlbumCoverPlaying2.setImageBitmap(albumArt);
                 }
             }
