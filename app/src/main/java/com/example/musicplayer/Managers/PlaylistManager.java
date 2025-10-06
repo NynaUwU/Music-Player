@@ -1,14 +1,12 @@
 package com.example.musicplayer.Managers;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.example.musicplayer.Musica;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -403,21 +401,8 @@ public class PlaylistManager {
         writeString(dos, musica.getArquivo());
 
         // Capa do álbum
-        Bitmap capaAlbum = musica.getCapaAlbum();
-        if (capaAlbum != null && !capaAlbum.isRecycled()) {
-            dos.writeBoolean(true); // Indica que há bitmap
-
-            // Compactar bitmap em JPEG para economizar espaço
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            capaAlbum.compress(Bitmap.CompressFormat.JPEG, 80, baos);
-            byte[] bitmapData = baos.toByteArray();
-            baos.close();
-
-            dos.writeInt(bitmapData.length);
-            dos.write(bitmapData);
-        } else {
-            dos.writeBoolean(false); // Indica que não há bitmap
-        }
+        boolean capaAlbum = musica.getCapaAlbum();
+        dos.writeBoolean(capaAlbum);
     }
 
     /**
@@ -440,22 +425,12 @@ public class PlaylistManager {
         String arquivo = readString(dis);
 
         // Capa do álbum
-        Bitmap capaAlbum = null;
-        boolean hasBitmap = dis.readBoolean();
-        if (hasBitmap) {
-            int bitmapSize = dis.readInt();
-            if (bitmapSize > 0 && bitmapSize < 10 * 1024 * 1024) { // Limite de 10MB por segurança
-                byte[] bitmapData = new byte[bitmapSize];
-                dis.readFully(bitmapData);
 
-                // Decodificar bitmap
-                capaAlbum = android.graphics.BitmapFactory.decodeByteArray(bitmapData, 0, bitmapSize);
-            }
-        }
+        boolean hasBitmap = dis.readBoolean();
 
         // Criar objeto Musica usando o construtor apropriado
         if (isMusic) {
-            return new Musica(nome, artista, duracao, arquivo, capaAlbum);
+            return new Musica(nome, artista, duracao, arquivo, hasBitmap);
         } else {
             // Para pastas, extrair número de músicas da duração
             String quantMP3 = duracao.replace(" Musicas", "");

@@ -1,5 +1,8 @@
 package com.example.musicplayer;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -8,6 +11,8 @@ import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class musicView extends AppCompatActivity {
+
+    private MediaMetadataRetriever mp3Info = new MediaMetadataRetriever();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,7 +25,17 @@ public class musicView extends AppCompatActivity {
         TextView MusicPlaying2 = findViewById(R.id.MusicPlaying2);
         TextView artistPlaying2 = findViewById(R.id.artistPlaying2);
         if (MainActivity.PlayingNow != null ){
-            AlbumCoverPlaying2.setImageBitmap(MainActivity.PlayingNow.getCapaAlbum());
+            if (MainActivity.PlayingNow.getCapaAlbum()) {
+                byte[] albumArtBytes = mp3Info.getEmbeddedPicture();
+                Bitmap albumArt = null;
+                if (albumArtBytes != null) {
+                    albumArt = BitmapFactory.decodeByteArray(albumArtBytes, 0, albumArtBytes.length);
+                    albumArt = Bitmap.createScaledBitmap(albumArt, 600, 600, true);
+                    AlbumCoverPlaying2.setImageBitmap(albumArt);
+                }
+            }
+
+            //AlbumCoverPlaying2.setImageBitmap(MainActivity.PlayingNow.getCapaAlbum());
             MusicPlaying2.setText(MainActivity.PlayingNow.getNome());
             artistPlaying2.setText(MainActivity.PlayingNow.getArtista());
         }

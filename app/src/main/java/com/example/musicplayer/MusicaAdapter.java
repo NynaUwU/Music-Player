@@ -1,6 +1,9 @@
 package com.example.musicplayer;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.MediaMetadataRetriever;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +15,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.bumptech.glide.request.RequestOptions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,16 +28,16 @@ public class MusicaAdapter extends RecyclerView.Adapter<MusicaAdapter.MusicaView
     private List<Musica> listaMusicas;
     private Context context;
     private OnMusicaClickListener listener;
-
-    // Interface para cliques nos itens
-    public interface OnMusicaClickListener {
-
-
-        void onMusicaClick(Musica musica, int position);
-        void onOpcoesClick(Musica musica, int position, View view);
-    }
+    private RequestOptions glideOptions;
+    private MediaMetadataRetriever mp3Info = new MediaMetadataRetriever();
 
     public MusicaAdapter(Context context, List<Musica> listaMusicas) {
+        glideOptions = new RequestOptions()
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .centerCrop()
+                .placeholder(R.drawable.album)
+                .error(R.drawable.album);
+
         if (context == null) {
             throw new IllegalArgumentException("Context não pode ser null");
         }
@@ -62,15 +68,33 @@ public class MusicaAdapter extends RecyclerView.Adapter<MusicaAdapter.MusicaView
         holder.tvDuracao.setText(musica.getDuracao());
 
         // Carregar imagem da capa (usando Glide ou Picasso se necessário)
-        if (musica.getCapaAlbum() != null) {
+        if (musica.getCapaAlbum()) {
             // Aqui você pode usar Glide ou Picasso para carregar a imagem
-            Glide.with(context).load(musica.getCapaAlbum()).into(holder.ivCapaAlbum);
+
+
+            mp3Info.setDataSource(musica.getArquivo());
+
+            byte[] albumArtBytes = mp3Info.getEmbeddedPicture();
+            Bitmap albumArt = null;
+            if (albumArtBytes != null) {
+                albumArt = BitmapFactory.decodeByteArray(albumArtBytes, 0, albumArtBytes.length);
+            }
+
+            Glide.with(context)
+                    .load(albumArt)
+                    .apply(glideOptions)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .into(holder.ivCapaAlbum);
+            Glide.with(context).load(albumArt).into(holder.ivCapaAlbum);
+
+            //holder.ivCapaAlbum.setImageResource(R.drawable.album);
+
 
         } else {
-            if(musica.isMusic()){
-            //holder.ivCapaAlbum.setImageResource(R.drawable.album);
-            holder.ivCapaAlbum.setImageResource(R.drawable.folder);
-            }else{
+            if (musica.isMusic()) {
+                //holder.ivCapaAlbum.setImageResource(R.drawable.album);
+                holder.ivCapaAlbum.setImageResource(R.drawable.album);
+            } else {
                 holder.ivCapaAlbum.setImageResource(R.drawable.folder);
             }
         }
@@ -98,6 +122,13 @@ public class MusicaAdapter extends RecyclerView.Adapter<MusicaAdapter.MusicaView
     public void updateList(List<Musica> novaLista) {
         this.listaMusicas = novaLista;
         notifyDataSetChanged();
+    }
+
+    // Interface para cliques nos itens
+    public interface OnMusicaClickListener {
+        void onMusicaClick(Musica musica, int position);
+
+        void onOpcoesClick(Musica musica, int position, View view);
     }
 
     // ViewHolder

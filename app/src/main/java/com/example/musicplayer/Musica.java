@@ -1,19 +1,17 @@
 package com.example.musicplayer;
 
-import android.graphics.Bitmap;
-
 import java.io.Serializable;
 
 public class Musica implements Serializable {
     private String nome;
     private String artista;
     private String duracao;
-    private Bitmap capaAlbum; // URL ou caminho da imagem
+    private boolean capaAlbum; // URL ou caminho da imagem
     private String arquivo; // Caminho do arquivo de áudio
     private boolean isMusic = true;
 
     // Construtor
-    public Musica(String nome, String artista, String duracao, String arquivo, Bitmap capaAlbum) {
+    public Musica(String nome, String artista, String duracao, String arquivo, boolean capaAlbum) {
         this.nome = nome;
         this.artista = artista;
         this.duracao = duracao;
@@ -26,7 +24,7 @@ public class Musica implements Serializable {
         this.nome = nome;
         this.artista = artista;
         this.duracao = duracao;
-        this.capaAlbum = null;
+        this.capaAlbum = false;
         this.arquivo = arquivo;
     }
 
@@ -35,7 +33,7 @@ public class Musica implements Serializable {
         this.nome = nome;
         this.artista = arquivo;
         this.duracao = QuantMP3+" Musicas";
-        this.capaAlbum = null;
+        this.capaAlbum = false;
         this.arquivo = arquivo;
     }
 
@@ -64,11 +62,11 @@ public class Musica implements Serializable {
         this.duracao = duracao;
     }
 
-    public Bitmap getCapaAlbum() {
+    public boolean getCapaAlbum() {
         return capaAlbum;
     }
 
-    public void setCapaAlbum(Bitmap capaAlbum) {
+    public void setCapaAlbum(boolean capaAlbum) {
         this.capaAlbum = capaAlbum;
     }
 

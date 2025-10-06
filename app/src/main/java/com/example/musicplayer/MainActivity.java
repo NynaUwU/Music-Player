@@ -2,8 +2,6 @@ package com.example.musicplayer;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
 import android.util.Log;
@@ -70,6 +68,12 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
         permissionHelper = new StoragePermissionHelper(this);
         playlistManager = new PlaylistManager(context);
 
+        /**
+        List<String> yep = playlistManager.getAllPlaylistNames();
+        for (String ye : yep){
+            playlistManager.deletePlaylist(ye);
+        }
+        **/
 
         // Solicita permissão para armazenamento
         permissionHelper.requestStoragePermission(new StoragePermissionHelper.PermissionCallback() {
@@ -120,9 +124,9 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
 
         setupRecyclerView();
         carregarMusicas(null, false);
-        recyclerView.setItemViewCacheSize(20);
+        recyclerView.setItemViewCacheSize(80);
         recyclerView.setDrawingCacheEnabled(true);
-        recyclerView.setDrawingCacheQuality(NavigationView.DRAWING_CACHE_QUALITY_HIGH);
+        recyclerView.setDrawingCacheQuality(NavigationView.DRAWING_CACHE_QUALITY_LOW);
 
         sideMenuButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -142,7 +146,6 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
                 startActivity(intent);
             }
         });
-
 
 
     }
@@ -202,6 +205,9 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
                     listaMusicas.add(tempM);
                     listaPastasMusica.add(tempM);
                 }
+
+                playlistManager.deletePlaylist("Folders");
+
                 playlistManager.savePlaylist("Folders", listaPastasMusica);
             }
         } else {
@@ -242,7 +248,6 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
 
                 //GET SONG IMAGE
                 byte[] albumArtBytes = mp3Info.getEmbeddedPicture();
-
                 // author/artista
                 String author;
 
@@ -277,14 +282,14 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
                 }
 
                 if (albumArtBytes != null) {
-                    Bitmap albumArt = BitmapFactory.decodeByteArray(albumArtBytes, 0, albumArtBytes.length);
+
                     //add Song
                     Musica tempM = new Musica(
                             title,
                             author,
                             duracao,
                             folder,
-                            albumArt
+                            true
                     );
                     listaMusicas.add(tempM);
 
