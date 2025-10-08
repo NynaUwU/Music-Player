@@ -3,8 +3,6 @@ package com.example.musicplayer;
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaMetadataRetriever;
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -22,11 +20,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.musicplayer.Managers.MP3FolderScanner;
 import com.example.musicplayer.Managers.MP3Scanner;
 import com.example.musicplayer.Managers.PlaylistManager;
+import com.example.musicplayer.Managers.playerManager;
 import com.example.musicplayer.database.AppDatabase;
 import com.example.musicplayer.database.Usuario;
 import com.google.android.material.navigation.NavigationView;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -51,7 +49,9 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
     private List<Musica> listaMusicasOnline;
     private List<Musica> listaPastasMusica;
     public static Musica PlayingNow;
-    private MediaPlayer mediaPlayer;
+    private playerManager playerManager;
+    private Thread audioThread;
+
     private String WhereAreWe = null;
     Intent intent;
 
@@ -133,6 +133,12 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
         //TODO music manager
 
 
+        if (audioThread == null || !audioThread.isAlive()) {
+            playerManager = new playerManager(context);
+            audioThread = new Thread(playerManager);
+            audioThread.start();
+        }
+
 //        try {
 //            mediaPlayer.setDataSource(getApplicationContext(), Uri.parse(PlayingNow.getArquivo()));
 //        } catch (IOException e) {
@@ -168,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
         musicaAdapter.setOnMusicaClickListener(this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(musicaAdapter);
-        mediaPlayer = new MediaPlayer();
+
     }
 
 
@@ -330,19 +336,14 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
         if (musica.isMusic()) {
             Toast.makeText(this, "Tocando: " + musica.getNome(), Toast.LENGTH_SHORT).show();
             PlayingNow = musica;
-            try {
-                File file = new File(PlayingNow.getArquivo());
-                Uri uri = Uri.fromFile(file);
-                mediaPlayer.stop();
-                mediaPlayer.reset();
-                mediaPlayer.setDataSource(context, uri);
-                mediaPlayer.prepare();
-                mediaPlayer.start();
 
+            //TODO MUSIC CODE
+            try {
+                playerManager.setMusicPlay(PlayingNow.getArquivo());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            //TODO MUSIC CODE
+
         } else {
             WhereAreWe = musica.getArquivo();
             carregarMusicas(musica.getArquivo(), false);
