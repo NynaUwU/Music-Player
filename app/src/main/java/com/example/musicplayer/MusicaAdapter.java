@@ -43,6 +43,7 @@ public class MusicaAdapter extends RecyclerView.Adapter<MusicaAdapter.MusicaView
         }
         if (listaMusicas == null) {
             listaMusicas = new ArrayList<>();
+            listaMusicas.add(new Musica(true,"","",""));
         }
         this.context = context;
         this.listaMusicas = listaMusicas;
@@ -85,7 +86,6 @@ public class MusicaAdapter extends RecyclerView.Adapter<MusicaAdapter.MusicaView
                     .apply(glideOptions)
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(holder.ivCapaAlbum);
-
             Glide.with(context).load(albumArt).into(holder.ivCapaAlbum);
 
             //holder.ivCapaAlbum.setImageResource(R.drawable.album);

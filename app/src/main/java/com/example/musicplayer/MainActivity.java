@@ -3,6 +3,8 @@ package com.example.musicplayer;
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaMetadataRetriever;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -24,6 +26,8 @@ import com.example.musicplayer.database.AppDatabase;
 import com.example.musicplayer.database.Usuario;
 import com.google.android.material.navigation.NavigationView;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -42,10 +46,12 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
     private MediaMetadataRetriever mp3Info = new MediaMetadataRetriever();
     private MusicaAdapter musicaAdapter;
     private PlaylistManager playlistManager;
+
     private List<Musica> listaMusicas;
     private List<Musica> listaMusicasOnline;
     private List<Musica> listaPastasMusica;
     public static Musica PlayingNow;
+    private MediaPlayer mediaPlayer;
     private String WhereAreWe = null;
     Intent intent;
 
@@ -69,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
         playlistManager = new PlaylistManager(context);
 
         /**
+         //limpar arquivos salvos
         List<String> yep = playlistManager.getAllPlaylistNames();
         for (String ye : yep){
             playlistManager.deletePlaylist(ye);
@@ -91,9 +98,7 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
         });
 
 
-
-
-        //Banco de dados
+        //TODO:Banco de dados
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -102,9 +107,7 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
                     ObjectOutputStream out = new ObjectOutputStream(cliente.getOutputStream());
                     ObjectInputStream in = new ObjectInputStream(cliente.getInputStream());
                     ccont = new AppDatabase(out, in);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                } catch (Exception ignored) {}
             }
         }).start();
 
@@ -121,12 +124,20 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
         recyclerView = findViewById(R.id.recycler_view_musicas);
         listaMusicas = new ArrayList<>();
         listaPastasMusica = new ArrayList<>();
-
         setupRecyclerView();
         carregarMusicas(null, false);
         recyclerView.setItemViewCacheSize(80);
         recyclerView.setDrawingCacheEnabled(true);
         recyclerView.setDrawingCacheQuality(NavigationView.DRAWING_CACHE_QUALITY_LOW);
+
+        //TODO music manager
+
+
+//        try {
+//            mediaPlayer.setDataSource(getApplicationContext(), Uri.parse(PlayingNow.getArquivo()));
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
 
         sideMenuButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -157,6 +168,7 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
         musicaAdapter.setOnMusicaClickListener(this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(musicaAdapter);
+        mediaPlayer = new MediaPlayer();
     }
 
 
@@ -317,8 +329,20 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
 
         if (musica.isMusic()) {
             Toast.makeText(this, "Tocando: " + musica.getNome(), Toast.LENGTH_SHORT).show();
-
             PlayingNow = musica;
+            try {
+                File file = new File(PlayingNow.getArquivo());
+                Uri uri = Uri.fromFile(file);
+                mediaPlayer.stop();
+                mediaPlayer.reset();
+                mediaPlayer.setDataSource(context, uri);
+                mediaPlayer.prepare();
+                mediaPlayer.start();
+
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            //TODO MUSIC CODE
         } else {
             WhereAreWe = musica.getArquivo();
             carregarMusicas(musica.getArquivo(), false);
