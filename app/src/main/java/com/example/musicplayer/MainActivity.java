@@ -38,10 +38,10 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnMusicaClickListener {
     public static Musica PlayingNow;
+    public boolean isRunning = false;
     private static AppDatabase ccont;
     Context context;
     Intent intent;
-    private StoragePermissionHelper permissionHelper;
     private ImageButton sideMenuButton;
     private ConstraintLayout FLbotton;
     private NavigationView sideMenu;
@@ -53,7 +53,6 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
     private ImageView musicView; // musicView
     private SeekBar seekBar;
     private Thread updateThread;
-    private boolean isRunning = false;
     //adapters
     private MediaMetadataRetriever mp3Info = new MediaMetadataRetriever();
     private MusicaAdapter musicaAdapter;
@@ -88,16 +87,15 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
         musicView = findViewById(R.id.musicView);
         seekBar = findViewById(R.id.seekBar);
 
-        permissionHelper = new StoragePermissionHelper(this);
+        StoragePermissionHelper permissionHelper = new StoragePermissionHelper(this);
         playlistManager = new PlaylistManager(context);
 
-        /**
+
          //limpar arquivos salvos
-         List<String> yep = playlistManager.getAllPlaylistNames();
-         for (String ye : yep){
-         playlistManager.deletePlaylist(ye);
-         }
-         **/
+
+         //List<String> yep = playlistManager.getAllPlaylistNames();
+         //for (String ye : yep){playlistManager.deletePlaylist(ye);}
+
 
         // Solicita permissão para armazenamento
         permissionHelper.requestStoragePermission(new StoragePermissionHelper.PermissionCallback() {
@@ -133,9 +131,7 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
             Usuario user = new Usuario("abc", "123");
             ccont.usuarioLogin(user);
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        } catch (Exception ignored){}
 
 
         //Musicas
@@ -152,12 +148,12 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
 
 
         if (audioThread == null || !audioThread.isAlive()) {
-            playerManager = new playerManager(context);
+            playerManager = new playerManager(context, this);
             audioThread = new Thread(playerManager);
             audioThread.start();
         }
-
-        setupSeekBar();
+//TODO barra
+        //setupSeekBar();
 
 
 //        try {
@@ -248,9 +244,7 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
                 int time = 100;
                 try {
                     time = playerManager.getTotalTime();
-                } catch (Exception e) {
-                    time = 100;
-                }
+                } catch (Exception ignored) {}
                 if (seekBar.getMax() != time) {
                     seekBar.setMax(time);
                 }
@@ -272,7 +266,7 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
         }
     }
 
-    private void setupSeekBar() {
+    public void setupSeekBar() {
         seekBar.setMax(playerManager.getTotalTime());
         seekBar.setProgress(0);
 

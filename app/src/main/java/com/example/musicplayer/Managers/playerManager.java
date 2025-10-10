@@ -4,6 +4,7 @@ import android.content.Context;
 import android.media.MediaPlayer;
 import android.net.Uri;
 
+import com.example.musicplayer.MainActivity;
 import com.example.musicplayer.Musica;
 
 import java.io.File;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 public class playerManager implements Runnable {
+    private final Object mainActivity;
     private Context context;
     private Random random = new Random();
     private MediaPlayer mediaPlayer;
@@ -26,9 +28,9 @@ public class playerManager implements Runnable {
     // 5 = repeat one
     public Musica music;
 
-    public playerManager(Context context) {
+    public playerManager(Context context, MainActivity activity) {
         this.context = context;
-
+        this.mainActivity = activity;
     }
 
     @Override
@@ -46,6 +48,7 @@ public class playerManager implements Runnable {
     }
 
     public boolean setMusicPlay(Musica music, List<Musica> listaPlayingNow, int mode) throws IOException {
+        MainActivity.
         this.listaPlayingNow = listaPlayingNow;
         this.oldListaPlayingNow = listaPlayingNow;
         this.music = music;
@@ -62,6 +65,7 @@ public class playerManager implements Runnable {
         } else {
             return false;
         }
+        
     }
 
     public void playPausePlayback() {
@@ -162,10 +166,6 @@ public class playerManager implements Runnable {
 
     public List<Musica> getListaPlayingNow() {
         return listaPlayingNow;
-    }
-
-    public void setListaPlayingNow(List<Musica> listaPlayingNow) {
-        this.listaPlayingNow = listaPlayingNow;
     }
 
     public void setMusic(Musica music) throws IOException {
