@@ -8,7 +8,10 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.PopupMenu;
+import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -34,28 +37,35 @@ import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnMusicaClickListener {
+    public static Musica PlayingNow;
     private static AppDatabase ccont;
     Context context;
+    Intent intent;
     private StoragePermissionHelper permissionHelper;
     private ImageButton sideMenuButton;
     private ConstraintLayout FLbotton;
     private NavigationView sideMenu;
     private RecyclerView recyclerView;
+    private ImageButton forwardButton;
+    private ImageButton playButton;
+    private ImageButton backButton;
+    private TextView musicPlayName;
+    private ImageView musicView; // musicView
+    private SeekBar seekBar;
+    private Thread updateThread;
+    private boolean isRunning = false;
+    //adapters
     private MediaMetadataRetriever mp3Info = new MediaMetadataRetriever();
     private MusicaAdapter musicaAdapter;
     private PlaylistManager playlistManager;
-
+    //listas
     private List<Musica> listaMusicas;
     private List<Musica> listaMusicasOnline;
     private List<Musica> listaPastasMusica;
-    public static Musica PlayingNow;
+    private List<Musica> listaPlayingNow;
     private playerManager playerManager;
     private Thread audioThread;
-
     private String WhereAreWe = null;
-    Intent intent;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,17 +80,24 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
         FLbotton = findViewById(R.id.FLbotton);
         sideMenu = findViewById(R.id.navBarLateral);
         sideMenu.setNavigationItemSelectedListener(this::onNavigationItemSelected);
+        forwardButton = findViewById(R.id.forwardButton);
+        sideMenuButton = findViewById(R.id.sideMenuButton);
+        playButton = findViewById(R.id.playButton);
+        backButton = findViewById(R.id.backButton);
+        musicPlayName = findViewById(R.id.musicPlayName);
+        musicView = findViewById(R.id.musicView);
+        seekBar = findViewById(R.id.seekBar);
 
         permissionHelper = new StoragePermissionHelper(this);
         playlistManager = new PlaylistManager(context);
 
         /**
          //limpar arquivos salvos
-        List<String> yep = playlistManager.getAllPlaylistNames();
-        for (String ye : yep){
-            playlistManager.deletePlaylist(ye);
-        }
-        **/
+         List<String> yep = playlistManager.getAllPlaylistNames();
+         for (String ye : yep){
+         playlistManager.deletePlaylist(ye);
+         }
+         **/
 
         // Solicita permissão para armazenamento
         permissionHelper.requestStoragePermission(new StoragePermissionHelper.PermissionCallback() {
@@ -107,7 +124,8 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
                     ObjectOutputStream out = new ObjectOutputStream(cliente.getOutputStream());
                     ObjectInputStream in = new ObjectInputStream(cliente.getInputStream());
                     ccont = new AppDatabase(out, in);
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
             }
         }).start();
 
@@ -139,6 +157,9 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
             audioThread.start();
         }
 
+        setupSeekBar();
+
+
 //        try {
 //            mediaPlayer.setDataSource(getApplicationContext(), Uri.parse(PlayingNow.getArquivo()));
 //        } catch (IOException e) {
@@ -155,6 +176,30 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
                 }
 
             }
+        });
+
+        forwardButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                playerManager.nextMediaPlayer();
+            }
+        });
+
+        playButton.setOnClickListener(v -> {
+            // Play/Pause
+            playerManager.playPausePlayback();
+        });
+
+        backButton.setOnClickListener(v -> {
+            // Faixa anterior
+            // TODO rewind button
+        });
+        musicPlayName.setOnClickListener(v -> {
+            // Você pode abrir um dialog, playlist, etc.
+            startActivity(intent);
+        });
+        musicView.setOnClickListener(v -> {
+            startActivity(intent);
         });
 
         FLbotton.setOnClickListener(new View.OnClickListener() {
@@ -184,16 +229,74 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
 
         if (id == R.id.RefreshButton) {
             // Handle home item click
-            carregarMusicas(WhereAreWe,true);
+            carregarMusicas(WhereAreWe, true);
         } else if (id == R.id.foldersButton) {
             // Handle settings item click
-            WhereAreWe=null;
-            carregarMusicas(WhereAreWe,false);
+            WhereAreWe = null;
+            carregarMusicas(WhereAreWe, false);
         }
 
 
         sideMenu.setVisibility(View.GONE); // Close the drawer after selection
         return true;
+    }
+
+    public void startUpdateThread() {
+        isRunning = true;
+        updateThread = new Thread(() -> {
+            while (isRunning) {
+                int time = 100;
+                try {
+                    time = playerManager.getTotalTime();
+                } catch (Exception e) {
+                    time = 100;
+                }
+                if (seekBar.getMax() != time) {
+                    seekBar.setMax(time);
+                }
+                seekBar.setProgress(playerManager.getProgress());
+            }
+            isRunning = false;
+        });
+        updateThread.start();
+    }
+
+    public void stopUpdateThread() {
+        isRunning = false;
+        if (updateThread != null) {
+            try {
+                updateThread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void setupSeekBar() {
+        seekBar.setMax(playerManager.getTotalTime());
+        seekBar.setProgress(0);
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser) {
+                    // Atualizar tempo atual baseado na posição da seekbar
+                    playerManager.setProgress(progress);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                // Pausar atualização quando o usuário tocá-la
+                stopUpdateThread();
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                // Retomar atualização quando soltar
+                startUpdateThread();
+            }
+        });
     }
 
     private void carregarMusicas(String folderToLoad, boolean refresh) {
@@ -237,9 +340,9 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
 
     private void listarMP3(String folderToLoad, boolean refresh) {
 
-        if (playlistManager.playlistExists(folderToLoad.replaceAll("/","")) && !refresh) {
+        if (playlistManager.playlistExists(folderToLoad.replaceAll("/", "")) && !refresh) {
             listaMusicas.clear();
-            listaMusicas = playlistManager.loadPlaylist(folderToLoad.replaceAll("/",""));
+            listaMusicas = playlistManager.loadPlaylist(folderToLoad.replaceAll("/", ""));
 
         } else {
             List<String> mp3Folders = new ArrayList<>();
@@ -324,7 +427,7 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
                 }
 
             }
-            playlistManager.savePlaylist(folderToLoad.replaceAll("/",""),listaMusicas);
+            playlistManager.savePlaylist(folderToLoad.replaceAll("/", ""), listaMusicas);
         }
     }
 
@@ -336,10 +439,16 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
         if (musica.isMusic()) {
             Toast.makeText(this, "Tocando: " + musica.getNome(), Toast.LENGTH_SHORT).show();
             PlayingNow = musica;
-
+            listaPlayingNow = listaMusicas;
+            stopUpdateThread();
             //TODO MUSIC CODE
             try {
-                playerManager.setMusicPlay(PlayingNow.getArquivo());
+                if(playerManager.music ==null){
+                    playerManager.setMusicPlay(PlayingNow, listaPlayingNow, 1);
+                } else{
+                    playerManager.setMusic(musica);
+                }
+                startUpdateThread();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -351,9 +460,6 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
         }
 
         Toast.makeText(this, "Tocando: " + musica.getNome(), Toast.LENGTH_SHORT).show();
-
-        // Aqui você pode implementar a lógica para tocar a música
-        // Por exemplo: iniciar um MediaPlayer, abrir uma tela de reprodução, etc.
     }
 
 
