@@ -66,7 +66,7 @@ public class MusicaAdapter extends RecyclerView.Adapter<MusicaAdapter.MusicaView
 
         holder.tvNomeMusica.setText(musica.getNome());
         holder.tvArtista.setText(musica.getArtista());
-        holder.tvDuracao.setText(musica.getDuracao());
+        holder.tvDuracao.setText(musica.getDuracaoStr());
 
         // Carregar imagem da capa (usando Glide ou Picasso se necessário)
         if (musica.getCapaAlbum()) {

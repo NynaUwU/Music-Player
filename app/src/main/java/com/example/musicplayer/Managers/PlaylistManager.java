@@ -395,7 +395,7 @@ public class PlaylistManager {
         writeString(dos, musica.getArtista());
 
         // Duração
-        writeString(dos, musica.getDuracao());
+        writeString(dos, musica.getDuracaoStr());
 
         // Arquivo
         writeString(dos, musica.getArquivo());

@@ -29,19 +29,17 @@ import com.example.musicplayer.database.Usuario;
 import com.google.android.material.navigation.NavigationView;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnMusicaClickListener {
     public static Musica PlayingNow;
-    public boolean isRunning = false;
     private static AppDatabase ccont;
+    public boolean isRunning = false;
     Context context;
     Intent intent;
+    private Usuario userLogado;
     private ImageButton sideMenuButton;
     private ConstraintLayout FLbotton;
     private NavigationView sideMenu;
@@ -91,10 +89,10 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
         playlistManager = new PlaylistManager(context);
 
 
-         //limpar arquivos salvos
+        //limpar arquivos salvos
 
-         //List<String> yep = playlistManager.getAllPlaylistNames();
-         //for (String ye : yep){playlistManager.deletePlaylist(ye);}
+        //List<String> yep = playlistManager.getAllPlaylistNames();
+        //for (String ye : yep){playlistManager.deletePlaylist(ye);}
 
 
         // Solicita permissão para armazenamento
@@ -114,24 +112,14 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
 
 
         //TODO:Banco de dados
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Socket cliente = new Socket("192.168.1.20", 12345);
-                    ObjectOutputStream out = new ObjectOutputStream(cliente.getOutputStream());
-                    ObjectInputStream in = new ObjectInputStream(cliente.getInputStream());
-                    ccont = new AppDatabase(out, in);
-                } catch (Exception ignored) {
-                }
-            }
-        }).start();
+        ccont = new AppDatabase();
 
         try {
-            Usuario user = new Usuario("abc", "123");
-            ccont.usuarioLogin(user);
-
-        } catch (Exception ignored){}
+            Usuario user = new Usuario("adm@adm.com", "1234");
+            userLogado = ccont.usuarioLogin(user);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
 
         //Musicas
@@ -152,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
             audioThread = new Thread(playerManager);
             audioThread.start();
         }
-//TODO barra
+        //TODO barra
         //setupSeekBar();
 
 
@@ -244,7 +232,8 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
                 int time = 100;
                 try {
                     time = playerManager.getTotalTime();
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
                 if (seekBar.getMax() != time) {
                     seekBar.setMax(time);
                 }
@@ -437,9 +426,9 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
             stopUpdateThread();
             //TODO MUSIC CODE
             try {
-                if(playerManager.music ==null){
+                if (playerManager.music == null) {
                     playerManager.setMusicPlay(PlayingNow, listaPlayingNow, 1);
-                } else{
+                } else {
                     playerManager.setMusic(musica);
                 }
                 startUpdateThread();
@@ -472,6 +461,10 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
                 return true;
             } else if (itemId == R.id.action_compartilhar) {
                 Toast.makeText(this, "Compartilhar: " + musica.getNome(), Toast.LENGTH_SHORT).show();
+                try {
+                    boolean test = ccont.cadastrarMusica(musica);
+                } catch (IOException | ClassNotFoundException ignored) {
+                }
                 return true;
             } else if (itemId == R.id.action_detalhes) {
                 Toast.makeText(this, "Detalhes de: " + musica.getNome(), Toast.LENGTH_SHORT).show();

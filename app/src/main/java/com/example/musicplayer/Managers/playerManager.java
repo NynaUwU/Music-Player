@@ -48,7 +48,7 @@ public class playerManager implements Runnable {
     }
 
     public boolean setMusicPlay(Musica music, List<Musica> listaPlayingNow, int mode) throws IOException {
-        MainActivity.
+
         this.listaPlayingNow = listaPlayingNow;
         this.oldListaPlayingNow = listaPlayingNow;
         this.music = music;
