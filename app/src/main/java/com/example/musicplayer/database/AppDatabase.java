@@ -3,9 +3,11 @@ package com.example.musicplayer.database;
 
 import android.net.TrafficStats;
 import android.os.StrictMode;
+import android.util.Log;
 
 import com.example.musicplayer.Musica;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,7 +37,7 @@ public class AppDatabase {
                 TrafficStats.setThreadStatsTag((int) Thread.currentThread().getId());
 
                 try {
-                    Socket cliente = new Socket("192.168.20.20", 12345);
+                    Socket cliente = new Socket("192.168.4.132", 12345);
                     OutputStream outMP3 = cliente.getOutputStream();
                     InputStream inMP3 = cliente.getInputStream();
                     ObjectOutputStream out = new ObjectOutputStream(outMP3);
@@ -91,14 +93,33 @@ public class AppDatabase {
             out.writeObject(music);
             in.readObject(); // lendo o "OK"
             FileInputStream fileInputStream = new FileInputStream(music.getArquivo());
-
-            byte[] buffer = new byte[4096];
-            int bytesRead;
-            while ((bytesRead = fileInputStream.read(buffer)) != -1) {
-                outMP3.write(buffer, 0, bytesRead);
-            }
+            File archiveFile = new File(music.getArquivo());
+            out.writeObject(archiveFile.length());
+            in.readObject(); // lendo o "OK"
             out.flush();
-            //in.readObject();
+            long size = archiveFile.length();
+
+            final int buffer_size = 4096;
+            try {
+                byte[] bytes = new byte[buffer_size];
+                for (int count=0,prog=0;count!=-1;) {
+                    count = fileInputStream.read(bytes);
+                    if(count != -1) {
+                        outMP3.write(bytes, 0, count);
+                        prog=prog+count;
+                        Log.d("upload", String.valueOf(((long) prog)*100/size));
+                    }
+                }
+                outMP3.flush();
+                out.flush();
+                fileInputStream.close();
+            } catch (Exception e) {
+            e.printStackTrace();
+            }
+
+
+            in.readObject();
+            in.readObject();
 
             return true;
         } catch (Exception e ){

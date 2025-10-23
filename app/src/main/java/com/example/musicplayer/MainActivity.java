@@ -3,6 +3,7 @@ package com.example.musicplayer;
 import android.content.Context;
 import android.content.Intent;
 import android.media.MediaMetadataRetriever;
+import android.net.TrafficStats;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -461,10 +462,20 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
                 return true;
             } else if (itemId == R.id.action_compartilhar) {
                 Toast.makeText(this, "Compartilhar: " + musica.getNome(), Toast.LENGTH_SHORT).show();
-                try {
-                    boolean test = ccont.cadastrarMusica(musica);
-                } catch (IOException | ClassNotFoundException ignored) {
-                }
+
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            TrafficStats.setThreadStatsTag((int) Thread.currentThread().getId());
+                            try {
+                                ccont.cadastrarMusica(musica);
+                            } catch (IOException | ClassNotFoundException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    }).start();
+
+
                 return true;
             } else if (itemId == R.id.action_detalhes) {
                 Toast.makeText(this, "Detalhes de: " + musica.getNome(), Toast.LENGTH_SHORT).show();
