@@ -37,7 +37,7 @@ public class AppDatabase {
                 TrafficStats.setThreadStatsTag((int) Thread.currentThread().getId());
 
                 try {
-                    Socket cliente = new Socket("192.168.4.132", 12345);
+                    Socket cliente = new Socket("192.168.20.29", 12345);
                     OutputStream outMP3 = cliente.getOutputStream();
                     InputStream inMP3 = cliente.getInputStream();
                     ObjectOutputStream out = new ObjectOutputStream(outMP3);
@@ -104,10 +104,13 @@ public class AppDatabase {
                 byte[] bytes = new byte[buffer_size];
                 for (int count=0,prog=0;count!=-1;) {
                     count = fileInputStream.read(bytes);
+                    if(count % 10 == 0){
+                        Log.d("upload", String.valueOf(((long) prog)*100/size));
+                    }
                     if(count != -1) {
                         outMP3.write(bytes, 0, count);
                         prog=prog+count;
-                        Log.d("upload", String.valueOf(((long) prog)*100/size));
+
                     }
                 }
                 outMP3.flush();

@@ -27,7 +27,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/cat" />
+            app:srcCompat="@drawable/cat"
+            tools:ignore="UseAppTint" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -173,7 +174,8 @@
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/seekBar2"
-        app:srcCompat="@drawable/play_circle" />
+        app:srcCompat="@drawable/play_circle"
+        tools:ignore="UseAppTint" />
 
     <ImageButton
         android:id="@+id/imageButton2"
@@ -181,10 +183,10 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:background="#00FFFFFF"
-        android:tint="#FF878787"
         app:layout_constraintStart_toEndOf="@+id/imageButton"
         app:layout_constraintTop_toTopOf="@+id/imageButton"
-        app:srcCompat="@drawable/skip_next" />
+        app:srcCompat="@drawable/skip_next"
+        app:tint="#FF878787" />
 
     <ImageButton
         android:id="@+id/imageButton3"
@@ -192,10 +194,10 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:background="#00FFFFFF"
-        android:tint="#FF878787"
         app:layout_constraintEnd_toStartOf="@+id/imageButton"
         app:layout_constraintTop_toTopOf="@+id/imageButton"
-        app:srcCompat="@drawable/skip_previous" />
+        app:srcCompat="@drawable/skip_previous"
+        app:tint="#FF878787" />
 
     <SeekBar
         android:id="@+id/seekBar2"
