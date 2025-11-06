@@ -36,22 +36,18 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnMusicaClickListener {
     public static Musica PlayingNow;
-    private static AppDatabase ccont;
+    public static AppDatabase ccont;
     public boolean isRunning = false;
+    private boolean registrar=true;
     Context context;
     Intent intent;
+    Intent intentcadastro;
     private Usuario userLogado;
-    private ImageButton sideMenuButton;
-    private ConstraintLayout FLbotton;
     private NavigationView sideMenu;
     private RecyclerView recyclerView;
-    private ImageButton forwardButton;
-    private ImageButton playButton;
-    private ImageButton backButton;
-    private TextView musicPlayName;
-    private ImageView musicView; // musicView
     private SeekBar seekBar;
     private Thread updateThread;
+
     //adapters
     private MediaMetadataRetriever mp3Info = new MediaMetadataRetriever();
     private MusicaAdapter musicaAdapter;
@@ -72,18 +68,20 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
         setContentView(R.layout.activity_main);
 
         intent = new Intent(context, musicView.class);
+        intentcadastro = new Intent(context, loginView.class);
 
         //Declarar botoes
-        sideMenuButton = findViewById((R.id.sideMenuButton));
-        FLbotton = findViewById(R.id.FLbotton);
+        ImageButton sideMenuButton = findViewById((R.id.sideMenuButton));
+        ConstraintLayout FLbotton = findViewById(R.id.FLbotton);
         sideMenu = findViewById(R.id.navBarLateral);
         sideMenu.setNavigationItemSelectedListener(this::onNavigationItemSelected);
-        forwardButton = findViewById(R.id.forwardButton);
+        ImageButton forwardButton = findViewById(R.id.forwardButton);
         sideMenuButton = findViewById(R.id.sideMenuButton);
-        playButton = findViewById(R.id.playButton);
-        backButton = findViewById(R.id.backButton);
-        musicPlayName = findViewById(R.id.musicPlayName);
-        musicView = findViewById(R.id.musicView);
+        ImageButton playButton = findViewById(R.id.playButton);
+        ImageButton backButton = findViewById(R.id.backButton);
+        TextView musicPlayName = findViewById(R.id.musicPlayName);
+        // musicView
+        ImageView musicView = findViewById(R.id.musicView);
         seekBar = findViewById(R.id.seekBar);
 
         StoragePermissionHelper permissionHelper = new StoragePermissionHelper(this);
@@ -114,13 +112,6 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
 
         //TODO:Banco de dados
         ccont = new AppDatabase();
-
-        try {
-            Usuario user = new Usuario("adm@adm.com", "1234");
-            userLogado = ccont.usuarioLogin(user);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
 
         //Musicas
@@ -219,6 +210,12 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
             // Handle settings item click
             WhereAreWe = null;
             carregarMusicas(WhereAreWe, false);
+        } else if (id == R.id.Registerbutt) {
+            intentcadastro.putExtra("login", false);
+            startActivity(intentcadastro);
+        } else if (id == R.id.Loginbutt) {
+            intentcadastro.putExtra("login", true);
+            startActivity(intentcadastro);
         }
 
 
@@ -380,6 +377,7 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
                 long minutos = (milliseconds / 1000) / 60;
                 long seconds = (milliseconds / 1000) % 60;
                 String duracao = minutos + ":";
+
                 if (String.valueOf(seconds).length() == 1) {
                     duracao = duracao + "0" + seconds;
                 } else {
@@ -463,17 +461,18 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
             } else if (itemId == R.id.action_compartilhar) {
                 Toast.makeText(this, "Compartilhar: " + musica.getNome(), Toast.LENGTH_SHORT).show();
 
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            TrafficStats.setThreadStatsTag((int) Thread.currentThread().getId());
-                            try {
-                                ccont.cadastrarMusica(musica);
-                            } catch (IOException | ClassNotFoundException e) {
-                                throw new RuntimeException(e);
-                            }
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        TrafficStats.setThreadStatsTag((int) Thread.currentThread().getId());
+                        try {
+
+                            ccont.cadastrarMusica(musica);
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
                         }
-                    }).start();
+                    }
+                }).start();
 
 
                 return true;

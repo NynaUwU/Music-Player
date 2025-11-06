@@ -22,6 +22,8 @@ public class AppDatabase {
     private OutputStream outMP3;
     private InputStream inMP3;
     private Usuario userLogado;
+    private Socket cliente;
+
 
 
     public AppDatabase() {
@@ -35,17 +37,25 @@ public class AppDatabase {
             @Override
             public void run() {
                 TrafficStats.setThreadStatsTag((int) Thread.currentThread().getId());
-
                 try {
-                    Socket cliente = new Socket("192.168.20.29", 12345);
-                    OutputStream outMP3 = cliente.getOutputStream();
-                    InputStream inMP3 = cliente.getInputStream();
-                    ObjectOutputStream out = new ObjectOutputStream(outMP3);
-                    ObjectInputStream in = new ObjectInputStream(inMP3);
-                    transfer(out, in, inMP3, outMP3);
-                } catch (Exception e) {
+                    cliente = new Socket("192.168.4.136", 12345);
+                } catch (RuntimeException | IOException e) {
                     throw new RuntimeException(e);
                 }
+
+                if (cliente.isConnected()) {
+                    try {
+                        OutputStream outMP3 = cliente.getOutputStream();
+                        InputStream inMP3 = cliente.getInputStream();
+                        ObjectOutputStream out = new ObjectOutputStream(outMP3);
+                        ObjectInputStream in = new ObjectInputStream(inMP3);
+                        transfer(out, in, inMP3, outMP3);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+
+                }
+
             }
         }).start();
 
@@ -70,7 +80,6 @@ public class AppDatabase {
     public Usuario usuarioLogin(Usuario user) {
 
         try {
-
             this.out.writeObject("UsuarioLogin");
             this.in.readObject(); // lendo o "OK"
             this.out.writeObject(user);
@@ -83,53 +92,67 @@ public class AppDatabase {
     }
 
     public boolean cadastrarMusica(Musica music) throws IOException, ClassNotFoundException {
-        try {
-            Usuario user = new Usuario("adm@adm.com", "1234");
-            userLogado = usuarioLogin(user);
+        if(userLogado!=null) {
             music.setUsuarioId(userLogado.getCodUsuario());
-
-            out.writeObject("cadastrarMusica");
-            in.readObject(); // lendo o "OK"
-            out.writeObject(music);
-            in.readObject(); // lendo o "OK"
-            FileInputStream fileInputStream = new FileInputStream(music.getArquivo());
-            File archiveFile = new File(music.getArquivo());
-            out.writeObject(archiveFile.length());
-            in.readObject(); // lendo o "OK"
-            out.flush();
-            long size = archiveFile.length();
-
-            final int buffer_size = 4096;
             try {
-                byte[] bytes = new byte[buffer_size];
-                for (int count=0,prog=0;count!=-1;) {
-                    count = fileInputStream.read(bytes);
-                    if(count % 10 == 0){
-                        Log.d("upload", String.valueOf(((long) prog)*100/size));
-                    }
-                    if(count != -1) {
-                        outMP3.write(bytes, 0, count);
-                        prog=prog+count;
-
-                    }
-                }
-                outMP3.flush();
+                out.writeObject("cadastrarMusica");
+                in.readObject(); // lendo o "OK"
+                out.writeObject(music);
+                in.readObject(); // lendo o "OK"
+                FileInputStream fileInputStream = new FileInputStream(music.getArquivo());
+                File archiveFile = new File(music.getArquivo());
+                out.writeObject(archiveFile.length());
+                in.readObject(); // lendo o "OK"
                 out.flush();
-                fileInputStream.close();
+                long size = archiveFile.length();
+
+                final int buffer_size = 4096;
+                try {
+                    byte[] bytes = new byte[buffer_size];
+                    for (int count = 0, prog = 0; count != -1; ) {
+                        count = fileInputStream.read(bytes);
+                        if (count % 10 == 0) {
+                            Log.d("upload", String.valueOf(((long) prog) * 100 / size));
+                        }
+                        if (count != -1) {
+                            outMP3.write(bytes, 0, count);
+                            prog = prog + count;
+
+                        }
+                    }
+                    outMP3.flush();
+                    out.flush();
+                    fileInputStream.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+
+                in.readObject();
+                in.readObject();
+
+                return true;
             } catch (Exception e) {
-            e.printStackTrace();
+                e.printStackTrace();
+                return false;
             }
+        }else {
+            return false;
+        }
+    }
 
-
-            in.readObject();
-            in.readObject();
-
-            return true;
-        } catch (Exception e ){
+    public boolean cadastrarUser(Usuario User) {
+        boolean result = false;
+        try {
+            this.out.writeObject("CadastroUser");
+            this.in.readObject(); // lendo o "OK"
+            this.out.writeObject(User);
+            result = (boolean) in.readObject();
+            return result;
+        } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
-
     }
 }
 

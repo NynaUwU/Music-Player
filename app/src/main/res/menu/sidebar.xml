@@ -14,8 +14,12 @@
     <item android:title="@string/playlist" />
     <item android:title="@string/allMusics" />
     <item android:title="@string/onMusic" />
-    <item android:title="@string/Login" />
-    <item android:title="@string/register" />
+    <item
+        android:id="@+id/Loginbutt"
+        android:title="@string/Login" />
+    <item
+        android:id="@+id/Registerbutt"
+        android:title="@string/register" />
     <item
         android:enabled="false"
         android:title="@string/account"
