@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 public class playerManager implements Runnable {
-    private final Object mainActivity;
+    private final MainActivity mainActivity;
     private Context context;
     private Random random = new Random();
     private MediaPlayer mediaPlayer;
@@ -41,6 +41,7 @@ public class playerManager implements Runnable {
             mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mp) {
+                    mediaPlayer = mp;
                     nextMediaPlayer();
                 }
             });
@@ -65,20 +66,25 @@ public class playerManager implements Runnable {
         } else {
             return false;
         }
-        
+
     }
 
     public void playPausePlayback() {
+
         if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+            mainActivity.stopUpdateThread();
             mediaPlayer.pause();
         } else if (mediaPlayer != null) {
             mediaPlayer.start();
+            mainActivity.startUpdateThread();
         }
     }
 
 
     public void nextMediaPlayer() {
         int here = listaPlayingNow.indexOf(music);
+
+        mainActivity.stopUpdateThread();
 
         switch (mode) {
             case 1:
@@ -98,6 +104,7 @@ public class playerManager implements Runnable {
                         throw new RuntimeException(e);
                     } finally {
                         music = listaPlayingNow.get(here);
+                        mainActivity.startUpdateThread();
                     }
                 }
                 break;
@@ -121,6 +128,7 @@ public class playerManager implements Runnable {
                         music = listaPlayingNow.get(here);
                     }
                 }
+                mainActivity.startUpdateThread();
                 break;
             case 4:
                 here = random.nextInt(listaPlayingNow.size());
@@ -137,6 +145,7 @@ public class playerManager implements Runnable {
                 } finally {
                     music = listaPlayingNow.get(here);
                 }
+                mainActivity.startUpdateThread();
                 break;
             case 5:
                 mediaPlayer.stop();
@@ -147,8 +156,8 @@ public class playerManager implements Runnable {
                 break;
         }
 
+        mainActivity.updateScreenComponents();
     }
-
 
 
     public int getMode() {
@@ -179,23 +188,28 @@ public class playerManager implements Runnable {
         mediaPlayer.start();
     }
 
-    public void setProgress(int percent){
+    public void setProgress(int percent) {
         mediaPlayer.seekTo(percent);
     }
 
-    public int getProgress(){
-        if (music==null){
+    public int getProgress() {
+        if (music == null) {
             return 100;
-        }else{
+        } else {
             return mediaPlayer.getCurrentPosition();
         }
     }
 
-    public int getTotalTime(){
-        if (music==null){
+    public int getTotalTime() {
+        if (music == null) {
             return 100;
-        }else{
-            return mediaPlayer.getDuration();
+        } else {
+            try {
+
+                return mediaPlayer.getDuration();
+            } catch (Exception ignored) {
+                return 100;
+            }
         }
     }
 

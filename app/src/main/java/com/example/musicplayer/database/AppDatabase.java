@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.net.InetAddress;
 import java.net.Socket;
 
 public class AppDatabase {
@@ -23,7 +24,6 @@ public class AppDatabase {
     private InputStream inMP3;
     private Usuario userLogado;
     private Socket cliente;
-
 
 
     public AppDatabase() {
@@ -37,13 +37,21 @@ public class AppDatabase {
             @Override
             public void run() {
                 TrafficStats.setThreadStatsTag((int) Thread.currentThread().getId());
+                String IP = "192.168.4.136";
+                boolean isReachable = false;
                 try {
-                    cliente = new Socket("192.168.4.136", 12345);
-                } catch (RuntimeException | IOException e) {
+                    isReachable = InetAddress.getByName(IP).isReachable(5000);
+                } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-
-                if (cliente.isConnected()) {
+                if (isReachable) {
+                    try {
+                        cliente = new Socket(IP, 12345);
+                    } catch (RuntimeException | IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+                if (cliente!=null) {
                     try {
                         OutputStream outMP3 = cliente.getOutputStream();
                         InputStream inMP3 = cliente.getInputStream();
@@ -78,21 +86,24 @@ public class AppDatabase {
 
     // TODO: Métodos que se comunicam com o servidor
     public Usuario usuarioLogin(Usuario user) {
-
-        try {
-            this.out.writeObject("UsuarioLogin");
-            this.in.readObject(); // lendo o "OK"
-            this.out.writeObject(user);
-            this.userLogado = (Usuario) in.readObject();
-            return this.userLogado;
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (cliente.isConnected()) {
+            try {
+                this.out.writeObject("UsuarioLogin");
+                this.in.readObject(); // lendo o "OK"
+                this.out.writeObject(user);
+                this.userLogado = (Usuario) in.readObject();
+                return this.userLogado;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        } else {
             return null;
         }
     }
 
     public boolean cadastrarMusica(Musica music) throws IOException, ClassNotFoundException {
-        if(userLogado!=null) {
+        if (userLogado != null) {
             music.setUsuarioId(userLogado.getCodUsuario());
             try {
                 out.writeObject("cadastrarMusica");
@@ -136,23 +147,30 @@ public class AppDatabase {
                 e.printStackTrace();
                 return false;
             }
-        }else {
+        } else {
             return false;
         }
     }
 
     public boolean cadastrarUser(Usuario User) {
         boolean result = false;
-        try {
-            this.out.writeObject("CadastroUser");
-            this.in.readObject(); // lendo o "OK"
-            this.out.writeObject(User);
-            result = (boolean) in.readObject();
+        if (cliente.isConnected()) {
+            try {
+                this.out.writeObject("CadastroUser");
+                this.in.readObject(); // lendo o "OK"
+                this.out.writeObject(User);
+                result = (boolean) in.readObject();
+                return result;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+        } else {
             return result;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
         }
+
     }
 }
+
+
 

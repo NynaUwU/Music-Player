@@ -2,6 +2,8 @@ package com.example.musicplayer;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.net.TrafficStats;
 import android.os.Bundle;
@@ -33,12 +35,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import kotlinx.coroutines.Delay;
+
 
 public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnMusicaClickListener {
     public static Musica PlayingNow;
     public static AppDatabase ccont;
     public boolean isRunning = false;
-    private boolean registrar=true;
     Context context;
     Intent intent;
     Intent intentcadastro;
@@ -60,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
     private playerManager playerManager;
     private Thread audioThread;
     private String WhereAreWe = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,7 +137,7 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
             audioThread.start();
         }
         //TODO barra
-        //setupSeekBar();
+        setupSeekBar();
 
 
 //        try {
@@ -157,7 +161,11 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
         forwardButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                stopUpdateThread();
                 playerManager.nextMediaPlayer();
+                startUpdateThread();
+                PlayingNow = playerManager.music;
+                updateScreenComponents();
             }
         });
 
@@ -187,6 +195,8 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
 
 
     }
+
+
 
     //Recycler view stuff --->
     private void setupRecyclerView() {
@@ -223,15 +233,41 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
         return true;
     }
 
+    public void updateScreenComponents(){
+        ImageView AlbumCoverPlaying2 = findViewById(R.id.musicView);
+        TextView MusicPlaying2 = findViewById(R.id.musicPlayName);
+        if (PlayingNow != null ){
+            if (PlayingNow.getCapaAlbum()) {
+                mp3Info.setDataSource(PlayingNow.getArquivo());
+
+                byte[] albumArtBytes = mp3Info.getEmbeddedPicture();
+                Bitmap albumArt = null;
+                if (albumArtBytes != null) {
+                    albumArt = BitmapFactory.decodeByteArray(albumArtBytes, 0, albumArtBytes.length);
+                    AlbumCoverPlaying2.setImageBitmap(albumArt);
+                }
+            }
+
+            //AlbumCoverPlaying2.setImageBitmap(MainActivity.PlayingNow.getCapaAlbum());
+            MusicPlaying2.setText(PlayingNow.getNome());
+        }
+    }
+
     public void startUpdateThread() {
         isRunning = true;
         updateThread = new Thread(() -> {
+            int time = 100;
+            try {
+                time = playerManager.getTotalTime();
+            } catch (Exception ignored) {
+            }
             while (isRunning) {
-                int time = 100;
                 try {
-                    time = playerManager.getTotalTime();
-                } catch (Exception ignored) {
+                    Thread.sleep(250);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
                 }
+
                 if (seekBar.getMax() != time) {
                     seekBar.setMax(time);
                 }
@@ -425,11 +461,10 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
             stopUpdateThread();
             //TODO MUSIC CODE
             try {
-                if (playerManager.music == null) {
+
                     playerManager.setMusicPlay(PlayingNow, listaPlayingNow, 1);
-                } else {
-                    playerManager.setMusic(musica);
-                }
+
+                updateScreenComponents();
                 startUpdateThread();
             } catch (IOException e) {
                 throw new RuntimeException(e);

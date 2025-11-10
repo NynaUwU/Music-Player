@@ -45,7 +45,7 @@ dependencies {
     implementation(libs.recyclerview)
     implementation(libs.room.common.jvm)
     implementation(libs.room.runtime.android)
-    implementation(files("C:\\Users\\posse\\Downloads\\mysql-connector-j-9.4.0.jar"))
+    //implementation(files("C:\\Users\\posse\\Downloads\\mysql-connector-j-9.4.0.jar"))
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
     implementation(libs.github.glide)

@@ -81,6 +81,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:background="@color/md_theme_onPrimaryContainer"
+            android:scaleType="centerCrop"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.033"
