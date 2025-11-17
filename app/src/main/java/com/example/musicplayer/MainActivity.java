@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.net.TrafficStats;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -50,17 +51,18 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
     private RecyclerView recyclerView;
     private SeekBar seekBar;
     private Thread updateThread;
+    private ImageButton playButton;
 
     //adapters
     private MediaMetadataRetriever mp3Info = new MediaMetadataRetriever();
-    private MusicaAdapter musicaAdapter;
+    public MusicaAdapter musicaAdapter;
     private PlaylistManager playlistManager;
     //listas
     private List<Musica> listaMusicas;
     private List<Musica> listaMusicasOnline;
     private List<Musica> listaPastasMusica;
     private List<Musica> listaPlayingNow;
-    private playerManager playerManager;
+    public static playerManager playerManager;
     private Thread audioThread;
     private String WhereAreWe = null;
 
@@ -81,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
         sideMenu.setNavigationItemSelectedListener(this::onNavigationItemSelected);
         ImageButton forwardButton = findViewById(R.id.forwardButton);
         sideMenuButton = findViewById(R.id.sideMenuButton);
-        ImageButton playButton = findViewById(R.id.playButton);
+        playButton = findViewById(R.id.playButton);
         ImageButton backButton = findViewById(R.id.backButton);
         TextView musicPlayName = findViewById(R.id.musicPlayName);
         // musicView
@@ -171,7 +173,14 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
 
         playButton.setOnClickListener(v -> {
             // Play/Pause
-            playerManager.playPausePlayback();
+            if (playerManager != null) {
+                playerManager.playPausePlayback();
+                if (playerManager.isPlaying()) {
+                    playButton.setImageResource(R.drawable.pause_circle);
+                } else {
+                    playButton.setImageResource(R.drawable.play_circle);
+                }
+            }
         });
 
         backButton.setOnClickListener(v -> {
@@ -181,6 +190,7 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
         musicPlayName.setOnClickListener(v -> {
             // Você pode abrir um dialog, playlist, etc.
             startActivity(intent);
+
         });
         musicView.setOnClickListener(v -> {
             startActivity(intent);
@@ -195,7 +205,6 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
 
 
     }
-
 
 
     //Recycler view stuff --->
@@ -233,10 +242,10 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
         return true;
     }
 
-    public void updateScreenComponents(){
+    public void updateScreenComponents() {
         ImageView AlbumCoverPlaying2 = findViewById(R.id.musicView);
         TextView MusicPlaying2 = findViewById(R.id.musicPlayName);
-        if (PlayingNow != null ){
+        if (PlayingNow != null) {
             if (PlayingNow.getCapaAlbum()) {
                 mp3Info.setDataSource(PlayingNow.getArquivo());
 
@@ -250,7 +259,13 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
 
             //AlbumCoverPlaying2.setImageBitmap(MainActivity.PlayingNow.getCapaAlbum());
             MusicPlaying2.setText(PlayingNow.getNome());
+            if (playerManager.isPlaying()) {
+                playButton.setImageResource(R.drawable.pause_circle);
+            } else {
+                playButton.setImageResource(R.drawable.pause_circle);
+            }
         }
+
     }
 
     public void startUpdateThread() {
@@ -276,16 +291,28 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
             isRunning = false;
         });
         updateThread.start();
+
+        if (playerManager.isPlaying()) {
+            playButton.setImageResource(R.drawable.pause_circle);
+        } else {
+            playButton.setImageResource(R.drawable.pause_circle);
+        }
     }
 
     public void stopUpdateThread() {
         isRunning = false;
+
         if (updateThread != null) {
             try {
                 updateThread.join();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+        }
+        if (playerManager.isPlaying()) {
+            playButton.setImageResource(R.drawable.pause_circle);
+        } else {
+            playButton.setImageResource(R.drawable.pause_circle);
         }
     }
 
@@ -319,40 +346,54 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
     private void carregarMusicas(String folderToLoad, boolean refresh) {
         // Dados
 
-        List<String> mp3Folders = new ArrayList<>();
+
 
         if (folderToLoad == null) {
             if (playlistManager.playlistExists("Folders") && !refresh) {
+
                 listaPastasMusica.clear();
                 listaPastasMusica = playlistManager.loadPlaylist("Folders");
                 listaMusicas.clear();
                 listaMusicas = listaPastasMusica;
 
             } else {
-                MP3FolderScanner scanner = new MP3FolderScanner(context);
-                mp3Folders = scanner.scanForMP3Folders();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        MP3FolderScanner scanner = new MP3FolderScanner(context);
+                        List<String> mp3Folders = new ArrayList<>();
+                        mp3Folders = scanner.scanForMP3Folders();
 
-                // Os diretórios ficam disponíveis na lista
-                listaPastasMusica.clear();
+                        // Os diretórios ficam disponíveis na lista
+                        listaPastasMusica.clear();
 
 
-                for (String folder : mp3Folders) {
-                    Log.d("MP3Folders", "Pasta encontrada: " + folder);
-                    List<String> temp = MP3Scanner.scanMp3Files(folder, false);
-                    Musica tempM = new Musica(false, folder.substring(folder.lastIndexOf('/') + 1), folder, String.valueOf(temp.size()));
-                    listaMusicas.add(tempM);
-                    listaPastasMusica.add(tempM);
-                }
+                        for (String folder : mp3Folders) {
+                            Log.d("MP3Folders", "Pasta encontrada: " + folder);
+                            List<String> temp = MP3Scanner.scanMp3Files(folder, false);
+                            Musica tempM = new Musica(false, folder.substring(folder.lastIndexOf('/') + 1), folder, String.valueOf(temp.size()));
 
-                playlistManager.deletePlaylist("Folders");
 
-                playlistManager.savePlaylist("Folders", listaPastasMusica);
+                            if (!listaPastasMusica.contains(tempM)) {
+                                listaPastasMusica.add(tempM);
+                                listarMP3(folder, true);
+                            }
+                        }
+                        listaMusicas = listaPastasMusica;
+                        musicaAdapter.updateList(listaMusicas);
+                        playlistManager.deletePlaylist("Folders");
+                        playlistManager.savePlaylist("Folders", listaPastasMusica);
+
+                    }
+
+                }).start();
             }
         } else {
             listarMP3(folderToLoad, refresh);
         }
 
         musicaAdapter.updateList(listaMusicas);
+
     }
 
     private void listarMP3(String folderToLoad, boolean refresh) {
@@ -462,7 +503,7 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
             //TODO MUSIC CODE
             try {
 
-                    playerManager.setMusicPlay(PlayingNow, listaPlayingNow, 1);
+                playerManager.setMusicPlay(PlayingNow, listaPlayingNow, 1);
 
                 updateScreenComponents();
                 startUpdateThread();

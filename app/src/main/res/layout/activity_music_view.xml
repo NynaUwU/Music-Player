@@ -164,7 +164,7 @@
         app:layout_constraintTop_toTopOf="@+id/button3" />
 
     <ImageButton
-        android:id="@+id/imageButton"
+        android:id="@+id/playButton2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="36dp"
@@ -179,24 +179,24 @@
         tools:ignore="UseAppTint" />
 
     <ImageButton
-        android:id="@+id/imageButton2"
+        android:id="@+id/forwardButton2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:background="#00FFFFFF"
-        app:layout_constraintStart_toEndOf="@+id/imageButton"
-        app:layout_constraintTop_toTopOf="@+id/imageButton"
+        app:layout_constraintStart_toEndOf="@+id/playButton2"
+        app:layout_constraintTop_toTopOf="@+id/playButton2"
         app:srcCompat="@drawable/skip_next"
         app:tint="#FF878787" />
 
     <ImageButton
-        android:id="@+id/imageButton3"
+        android:id="@+id/BackButton2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
         android:background="#00FFFFFF"
-        app:layout_constraintEnd_toStartOf="@+id/imageButton"
-        app:layout_constraintTop_toTopOf="@+id/imageButton"
+        app:layout_constraintEnd_toStartOf="@+id/playButton2"
+        app:layout_constraintTop_toTopOf="@+id/playButton2"
         app:srcCompat="@drawable/skip_previous"
         app:tint="#FF878787" />
 

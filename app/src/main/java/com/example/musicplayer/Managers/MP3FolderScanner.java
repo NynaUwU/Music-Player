@@ -56,7 +56,7 @@ public class MP3FolderScanner {
             }
 
             // Verifica pastas comuns de música
-            scanCommonMusicDirectories();
+            //scanCommonMusicDirectories();
 
         } catch (SecurityException e) {
             Log.e(TAG, "Erro de permissão ao acessar armazenamento: " + e.getMessage());

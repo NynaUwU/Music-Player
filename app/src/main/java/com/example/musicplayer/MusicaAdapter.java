@@ -43,7 +43,7 @@ public class MusicaAdapter extends RecyclerView.Adapter<MusicaAdapter.MusicaView
         }
         if (listaMusicas == null) {
             listaMusicas = new ArrayList<>();
-            listaMusicas.add(new Musica(true,"","",""));
+            listaMusicas.add(new Musica(true, "", "", ""));
         }
         this.context = context;
         this.listaMusicas = listaMusicas;
@@ -72,20 +72,15 @@ public class MusicaAdapter extends RecyclerView.Adapter<MusicaAdapter.MusicaView
         if (musica.getCapaAlbum()) {
             // Aqui você pode usar Glide ou Picasso para carregar a imagem
 
-
             mp3Info.setDataSource(musica.getArquivo());
 
             byte[] albumArtBytes = mp3Info.getEmbeddedPicture();
             Bitmap albumArt = null;
             if (albumArtBytes != null) {
+
                 albumArt = BitmapFactory.decodeByteArray(albumArtBytes, 0, albumArtBytes.length);
             }
 
-            Glide.with(context)
-                    .load(albumArt)
-                    .apply(glideOptions)
-                    .transition(DrawableTransitionOptions.withCrossFade())
-                    .into(holder.ivCapaAlbum);
             Glide.with(context).load(albumArt).into(holder.ivCapaAlbum);
 
             //holder.ivCapaAlbum.setImageResource(R.drawable.album);

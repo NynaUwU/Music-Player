@@ -16,6 +16,7 @@ import java.util.Random;
 public class playerManager implements Runnable {
     private final MainActivity mainActivity;
     private Context context;
+    private boolean playing = false;
     private Random random = new Random();
     private MediaPlayer mediaPlayer;
     private List<Musica> oldListaPlayingNow;
@@ -74,24 +75,67 @@ public class playerManager implements Runnable {
         if (mediaPlayer != null && mediaPlayer.isPlaying()) {
             mainActivity.stopUpdateThread();
             mediaPlayer.pause();
+            playing = false;
         } else if (mediaPlayer != null) {
             mediaPlayer.start();
             mainActivity.startUpdateThread();
+            playing = true;
         }
     }
 
 
     public void nextMediaPlayer() {
-        int here = listaPlayingNow.indexOf(music);
+        if (listaPlayingNow != null) {
+            int here = listaPlayingNow.indexOf(music);
 
-        mainActivity.stopUpdateThread();
+            mainActivity.stopUpdateThread();
 
-        switch (mode) {
-            case 1:
-                if (here + 1 == listaPlayingNow.size()) {
-                    StopPlayer();
-                } else {
-                    here++;
+            switch (mode) {
+                case 1:
+                    if (here + 1 == listaPlayingNow.size()) {
+                        StopPlayer();
+                    } else {
+                        here++;
+                        try {
+                            File file = new File(listaPlayingNow.get(here).getArquivo());
+                            Uri uri = Uri.fromFile(file);
+                            mediaPlayer.stop();
+                            mediaPlayer.reset();
+                            mediaPlayer.setDataSource(this.context, uri);
+                            mediaPlayer.prepare();
+                            mediaPlayer.start();
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        } finally {
+                            music = listaPlayingNow.get(here);
+                            mainActivity.startUpdateThread();
+                        }
+                    }
+                    break;
+                case 2:
+                case 3:
+                    if (here + 1 == listaPlayingNow.size()) {
+                        here = 0;
+                    } else {
+                        here++;
+                        try {
+                            File file = new File(listaPlayingNow.get(here).getArquivo());
+                            Uri uri = Uri.fromFile(file);
+                            mediaPlayer.stop();
+                            mediaPlayer.reset();
+                            mediaPlayer.setDataSource(this.context, uri);
+                            mediaPlayer.prepare();
+                            mediaPlayer.start();
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        } finally {
+                            music = listaPlayingNow.get(here);
+                        }
+                    }
+                    mainActivity.startUpdateThread();
+                    break;
+                case 4:
+                    here = random.nextInt(listaPlayingNow.size());
                     try {
                         File file = new File(listaPlayingNow.get(here).getArquivo());
                         Uri uri = Uri.fromFile(file);
@@ -104,59 +148,20 @@ public class playerManager implements Runnable {
                         throw new RuntimeException(e);
                     } finally {
                         music = listaPlayingNow.get(here);
-                        mainActivity.startUpdateThread();
                     }
-                }
-                break;
-            case 2:
-            case 3:
-                if (here + 1 == listaPlayingNow.size()) {
-                    here = 0;
-                } else {
-                    here++;
-                    try {
-                        File file = new File(listaPlayingNow.get(here).getArquivo());
-                        Uri uri = Uri.fromFile(file);
-                        mediaPlayer.stop();
-                        mediaPlayer.reset();
-                        mediaPlayer.setDataSource(this.context, uri);
-                        mediaPlayer.prepare();
-                        mediaPlayer.start();
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    } finally {
-                        music = listaPlayingNow.get(here);
-                    }
-                }
-                mainActivity.startUpdateThread();
-                break;
-            case 4:
-                here = random.nextInt(listaPlayingNow.size());
-                try {
-                    File file = new File(listaPlayingNow.get(here).getArquivo());
-                    Uri uri = Uri.fromFile(file);
+                    mainActivity.startUpdateThread();
+                    break;
+                case 5:
                     mediaPlayer.stop();
-                    mediaPlayer.reset();
-                    mediaPlayer.setDataSource(this.context, uri);
-                    mediaPlayer.prepare();
                     mediaPlayer.start();
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                } finally {
-                    music = listaPlayingNow.get(here);
-                }
-                mainActivity.startUpdateThread();
-                break;
-            case 5:
-                mediaPlayer.stop();
-                mediaPlayer.start();
-                break;
-            default:
+                    break;
+                default:
 
-                break;
+                    break;
+            }
+
+            mainActivity.updateScreenComponents();
         }
-
-        mainActivity.updateScreenComponents();
     }
 
 
@@ -216,6 +221,11 @@ public class playerManager implements Runnable {
     private void StopPlayer() {
         mediaPlayer.stop();
         mediaPlayer.reset();
+        playing = false;
         //mediaPlayer.release();
+    }
+
+    public boolean isPlaying() {
+        return playing;
     }
 }
