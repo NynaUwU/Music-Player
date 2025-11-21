@@ -122,8 +122,8 @@
 
         <TextView
             android:id="@+id/musicPlayName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="158dp"
+            android:layout_height="15dp"
             android:layout_marginStart="4dp"
             android:text="music template"
             android:textColor="@color/md_theme_onPrimaryContainer_mediumContrast"
@@ -131,7 +131,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/musicView"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.296" />
+            app:layout_constraintVertical_bias="0.296"
+            app:layout_constraintWidth_max="158dp" />
 
         <SeekBar
             android:id="@+id/seekBar"

@@ -5,8 +5,10 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
+import android.media.MediaPlayer;
 import android.net.TrafficStats;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Parcelable;
 import android.util.Log;
 import android.view.MenuItem;
@@ -65,6 +67,9 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
     public static playerManager playerManager;
     private Thread audioThread;
     private String WhereAreWe = null;
+    private Handler handler = new Handler();
+    private Runnable runnableCode;
+    private static final int INTERVAL = 250;
 
 
     @Override
@@ -148,6 +153,17 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
 //            throw new RuntimeException(e);
 //        }
 
+
+        runnableCode = () -> {
+            // Put your periodic command/task here
+            Log.d("PeriodicTask", "Running");
+            updateScreenComponents();
+            // Reschedule the same runnable code block again
+            handler.postDelayed(runnableCode, INTERVAL);
+        };
+
+        handler.post(runnableCode);
+
         sideMenuButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -204,6 +220,16 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
         });
 
 
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            updateScreenComponents();
+        } else {
+
+        }
     }
 
 
