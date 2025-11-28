@@ -73,9 +73,10 @@ public class loginView extends AppCompatActivity {
                         }
                         String senhaMax = sb.toString();
 
-                        if (IP.getText().toString().length() > 7) {
+                        if (String.valueOf(IP.getText()).length() > 7) {
                             MainActivity.startAppDatabase(String.valueOf(IP.getText()));
                         }
+
                         Usuario result = null;
                         if (MainActivity.ccont != null) {
                             if (MainActivity.ccont.cliente != null) {
