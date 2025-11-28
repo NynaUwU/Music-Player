@@ -35,6 +35,7 @@ public class loginView extends AppCompatActivity {
         EditText email = findViewById(R.id.JTFEmail);
         EditText senha = findViewById(R.id.JTFpassword);
         EditText senha2 = findViewById(R.id.JTFconfirmPassword);
+        EditText IP = findViewById(R.id.JTserverIP);
         Button confirm = findViewById(R.id.JBlogin);
 
         if (intent.getBooleanExtra("login", true)) {
@@ -72,15 +73,28 @@ public class loginView extends AppCompatActivity {
                         }
                         String senhaMax = sb.toString();
 
-                        Usuario user = new Usuario(Semail, senhaMax);
-
-                        Usuario result = MainActivity.ccont.usuarioLogin(user);
+                        if (IP.getText().toString().length() > 7) {
+                            MainActivity.startAppDatabase(String.valueOf(IP.getText()));
+                        }
+                        Usuario result = null;
+                        if (MainActivity.ccont != null) {
+                            if (MainActivity.ccont.cliente != null) {
+                                Usuario user = new Usuario(Semail, senhaMax);
+                                result = MainActivity.ccont.usuarioLogin(user);
+                            } else {
+                                Toast.makeText(context, "Conexao perdida", Toast.LENGTH_SHORT).show();
+                            }
+                        }else {
+                            Toast.makeText(context, "Conexao perdida", Toast.LENGTH_SHORT).show();
+                        }
 
                         if (result != null) {
                             finish();
-                        }else{
-                            Toast.makeText(context, "Login falhou", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(context, "Login falhou", Toast.LENGTH_LONG).show();
                         }
+                    } else {
+                        Toast.makeText(context, "Por favor preenchaos campos", Toast.LENGTH_LONG).show();
                     }
                 } else {
                     if (!Snome.isEmpty() || !Semail.isEmpty() || !Ssenha.isEmpty() || !Ssenha2.isEmpty()) {
@@ -103,10 +117,29 @@ public class loginView extends AppCompatActivity {
                             }
                             String senhaMax = sb.toString();
 
-                            Usuario user = new Usuario(Snome, Semail, senhaMax);
+                            if (IP.getText().toString().length() > 7) {
+                                MainActivity.startAppDatabase(String.valueOf(IP.getText()));
+                            }
+                            boolean result = false;
+                            if (MainActivity.ccont != null) {
+                                if (MainActivity.ccont.cliente != null) {
+                                    Usuario user = new Usuario(Snome, Semail, senhaMax);
+                                    result = MainActivity.ccont.cadastrarUser(user);
+                                } else {
+                                    Toast.makeText(context, "Conexao perdida", Toast.LENGTH_SHORT).show();
+                                }
+                            }else {
+                                Toast.makeText(context, "Conexao perdida", Toast.LENGTH_SHORT).show();
+                            }
 
-                            MainActivity.ccont.cadastrarUser(user);
+                            if (!result) {
+                                finish();
+                            } else {
+                                Toast.makeText(context, "cadastro falhou", Toast.LENGTH_LONG).show();
+                            }
                         }
+                    }else {
+                        Toast.makeText(context, "Por favor preenchaos campos", Toast.LENGTH_LONG).show();
                     }
 
                 }

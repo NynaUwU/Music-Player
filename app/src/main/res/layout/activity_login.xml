@@ -115,4 +115,20 @@
         app:layout_constraintStart_toStartOf="@+id/imageView3"
         app:layout_constraintTop_toBottomOf="@+id/JTFpassword" />
 
+    <EditText
+        android:id="@+id/JTserverIP"
+        android:layout_width="219dp"
+        android:layout_height="51dp"
+        android:layout_marginBottom="8dp"
+        android:background="@color/md_theme_onPrimaryFixedVariant"
+        android:ems="10"
+        android:hint="Server IP"
+        android:inputType="text"
+        android:textAlignment="center"
+        android:textColorHint="@color/md_theme_onBackground_mediumContrast"
+        app:layout_constraintBottom_toTopOf="@+id/imageView3"
+        app:layout_constraintEnd_toEndOf="@+id/imageView3"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="@+id/imageView3" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
