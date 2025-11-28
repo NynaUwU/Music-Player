@@ -23,21 +23,20 @@ public class AppDatabase {
     private OutputStream outMP3;
     private InputStream inMP3;
     private Usuario userLogado;
-    private Socket cliente;
+    public Socket cliente;
 
 
-    public AppDatabase() {
+    public AppDatabase(String IP) {
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy); // PermitAll for testing, be cautious in production
-
+            cliente=null;
         // Inside your network thread:
 
         new Thread(new Runnable() {
             @Override
             public void run() {
                 TrafficStats.setThreadStatsTag((int) Thread.currentThread().getId());
-                String IP = "192.168.4.136";
                 boolean isReachable = false;
                 try {
                     isReachable = InetAddress.getByName(IP).isReachable(5000);
@@ -49,6 +48,7 @@ public class AppDatabase {
                         cliente = new Socket(IP, 12345);
                     } catch (RuntimeException | IOException e) {
                         throw new RuntimeException(e);
+
                     }
                 }
                 if (cliente!=null) {

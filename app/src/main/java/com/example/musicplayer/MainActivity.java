@@ -37,6 +37,7 @@ import com.google.android.material.navigation.NavigationView;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import kotlinx.coroutines.Delay;
 
@@ -60,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
     public MusicaAdapter musicaAdapter;
     private PlaylistManager playlistManager;
     //listas
-    private List<Musica> listaMusicas;
+    private static List<Musica> listaMusicas;
     private List<Musica> listaMusicasOnline;
     private List<Musica> listaPastasMusica;
     private List<Musica> listaPlayingNow;
@@ -122,8 +123,6 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
 
 
         //TODO:Banco de dados
-        ccont = new AppDatabase();
-
 
         //Musicas
         recyclerView = findViewById(R.id.recycler_view_musicas);
@@ -156,7 +155,7 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
 
         runnableCode = () -> {
             // Put your periodic command/task here
-            Log.d("PeriodicTask", "Running");
+            //Log.d("PeriodicTask", "Running");
             updateScreenComponents();
             // Reschedule the same runnable code block again
             handler.postDelayed(runnableCode, INTERVAL);
@@ -229,6 +228,14 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
             updateScreenComponents();
         } else {
 
+        }
+    }
+
+    public static void startAppDatabase(String IP){
+        if (Objects.equals(IP, "")) {
+            ccont = new AppDatabase(IP);
+        }else {
+            ccont=null;
         }
     }
 
@@ -406,9 +413,13 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
                             }
                         }
                         listaMusicas = listaPastasMusica;
-                        musicaAdapter.updateList(listaMusicas);
                         playlistManager.deletePlaylist("Folders");
                         playlistManager.savePlaylist("Folders", listaPastasMusica);
+                        try {
+                            musicaAdapter.updateList(listaMusicas);
+                        } catch (RuntimeException e) {
+                            throw new RuntimeException(e);
+                        }
 
                     }
 
