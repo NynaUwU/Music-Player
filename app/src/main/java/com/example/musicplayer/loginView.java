@@ -5,6 +5,7 @@ import static android.view.View.INVISIBLE;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -41,6 +42,7 @@ public class loginView extends AppCompatActivity {
         if (intent.getBooleanExtra("login", true)) {
             senha2.setVisibility(INVISIBLE);
             nome.setVisibility(INVISIBLE);
+            confirm.setText("Login");
         }
 
 
@@ -51,6 +53,7 @@ public class loginView extends AppCompatActivity {
                 String Semail = String.valueOf(email.getText());
                 String Ssenha = String.valueOf(senha.getText());
                 String Ssenha2 = String.valueOf(senha2.getText());
+                String IPnice = String.valueOf(IP.getText());
 
                 if (intent.getBooleanExtra("login", true)) {
                     if (!Semail.isEmpty() || !Ssenha.isEmpty()) {
@@ -71,9 +74,14 @@ public class loginView extends AppCompatActivity {
                         for (byte b : messageDigest) {
                             sb.append(String.format("%02x", 0xFF & b));
                         }
-                        String senhaMax = sb.toString();
 
-                        MainActivity.startAppDatabase("198.168.1.19");
+                        String senhaMax = sb.toString();//senha criptografada
+
+
+                        if (Patterns.IP_ADDRESS.matcher(IPnice).matches() && MainActivity.ccont == null) {
+                            MainActivity.startAppDatabase(IPnice);
+                        }
+
 
                         Usuario result = null;
                         if (MainActivity.ccont != null) {
@@ -83,7 +91,7 @@ public class loginView extends AppCompatActivity {
                             } else {
                                 Toast.makeText(context, "Conexao perdida", Toast.LENGTH_SHORT).show();
                             }
-                        }else {
+                        } else {
                             Toast.makeText(context, "Conexao perdida", Toast.LENGTH_SHORT).show();
                         }
 
@@ -114,11 +122,14 @@ public class loginView extends AppCompatActivity {
                             for (byte b : messageDigest) {
                                 sb.append(String.format("%02x", 0xFF & b));
                             }
-                            String senhaMax = sb.toString();
 
-                            if (IP.getText().toString().length() > 7) {
-                                MainActivity.startAppDatabase(String.valueOf(IP.getText()));
+                            String senhaMax = sb.toString(); //senha criptografada
+
+
+                            if (Patterns.IP_ADDRESS.matcher(IPnice).matches() && MainActivity.ccont == null) {
+                                MainActivity.startAppDatabase(IPnice);
                             }
+
                             boolean result = false;
                             if (MainActivity.ccont != null) {
                                 if (MainActivity.ccont.cliente != null) {
@@ -127,7 +138,7 @@ public class loginView extends AppCompatActivity {
                                 } else {
                                     Toast.makeText(context, "Conexao perdida", Toast.LENGTH_SHORT).show();
                                 }
-                            }else {
+                            } else {
                                 Toast.makeText(context, "Conexao perdida", Toast.LENGTH_SHORT).show();
                             }
 
@@ -137,7 +148,7 @@ public class loginView extends AppCompatActivity {
                                 Toast.makeText(context, "cadastro falhou", Toast.LENGTH_LONG).show();
                             }
                         }
-                    }else {
+                    } else {
                         Toast.makeText(context, "Por favor preenchaos campos", Toast.LENGTH_LONG).show();
                     }
 

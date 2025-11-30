@@ -5,12 +5,11 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
-import android.media.MediaPlayer;
 import android.net.TrafficStats;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Parcelable;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -39,13 +38,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import kotlinx.coroutines.Delay;
-
 
 public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnMusicaClickListener {
+    private static final int INTERVAL = 250;
     public static Musica PlayingNow;
     public static AppDatabase ccont;
+    public static playerManager playerManager;
+    //listas
+    private static List<Musica> listaMusicas;
     public boolean isRunning = false;
+    public MusicaAdapter musicaAdapter;
     Context context;
     Intent intent;
     Intent intentcadastro;
@@ -55,29 +57,27 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
     private SeekBar seekBar;
     private Thread updateThread;
     private ImageButton playButton;
-
     //adapters
     private MediaMetadataRetriever mp3Info = new MediaMetadataRetriever();
-    public MusicaAdapter musicaAdapter;
     private PlaylistManager playlistManager;
-    //listas
-    private static List<Musica> listaMusicas;
     private List<Musica> listaMusicasOnline;
     private List<Musica> listaPastasMusica;
     private List<Musica> listaPlayingNow;
-    public static playerManager playerManager;
     private Thread audioThread;
     private String WhereAreWe = null;
     private Handler handler = new Handler();
     private Runnable runnableCode;
-    private static final int INTERVAL = 250;
 
+    public static void startAppDatabase(String IP) {
+        ccont = new AppDatabase(IP);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         context = this;
         setContentView(R.layout.activity_main);
+        ccont = null;
 
         intent = new Intent(context, musicView.class);
         intentcadastro = new Intent(context, loginView.class);
@@ -231,15 +231,6 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
         }
     }
 
-    public static void startAppDatabase(String IP){
-        if (Objects.equals(IP, "")) {
-            ccont = new AppDatabase(IP);
-        }else {
-            ccont=null;
-        }
-    }
-
-
     //Recycler view stuff --->
     private void setupRecyclerView() {
         listaMusicas = new ArrayList<>();
@@ -263,11 +254,19 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
             WhereAreWe = null;
             carregarMusicas(WhereAreWe, false);
         } else if (id == R.id.Registerbutt) {
+
             intentcadastro.putExtra("login", false);
             startActivity(intentcadastro);
+
         } else if (id == R.id.Loginbutt) {
-            intentcadastro.putExtra("login", true);
-            startActivity(intentcadastro);
+            Menu navMenu = sideMenu.getMenu();
+            MenuItem change = navMenu.findItem(R.id.Loginbutt);
+            if (Objects.equals(change.getTitle(), "LogOut")) {
+                ccont = null;
+            } else {
+                intentcadastro.putExtra("login", true);
+                startActivity(intentcadastro);
+            }
         }
 
 
@@ -278,6 +277,28 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
     public void updateScreenComponents() {
         ImageView AlbumCoverPlaying2 = findViewById(R.id.musicView);
         TextView MusicPlaying2 = findViewById(R.id.musicPlayName);
+        if (ccont != null) {
+            if (ccont.getUserLogado() != null) {
+
+                Menu navMenu = sideMenu.getMenu();
+                MenuItem change = navMenu.findItem(R.id.Loginbutt);
+                MenuItem hide = navMenu.findItem(R.id.Registerbutt);
+                MenuItem hide1 = navMenu.findItem(R.id.OnlineMusicSearch);
+                hide1.setVisible(true);
+                hide.setVisible(false);
+
+                change.setTitle("LogOut");
+            }
+        } else {
+
+            Menu navMenu = sideMenu.getMenu();
+            MenuItem change = navMenu.findItem(R.id.Loginbutt);
+            MenuItem hide = navMenu.findItem(R.id.Registerbutt);
+            MenuItem hide1 = navMenu.findItem(R.id.OnlineMusicSearch);
+            hide1.setVisible(false);
+            hide.setVisible(true);
+            change.setTitle("Logar");
+        }
         if (PlayingNow != null) {
             if (PlayingNow.getCapaAlbum()) {
                 mp3Info.setDataSource(PlayingNow.getArquivo());
@@ -378,9 +399,6 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
 
     private void carregarMusicas(String folderToLoad, boolean refresh) {
         // Dados
-
-
-
         if (folderToLoad == null) {
             if (playlistManager.playlistExists("Folders") && !refresh) {
 
@@ -388,6 +406,8 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
                 listaPastasMusica = playlistManager.loadPlaylist("Folders");
                 listaMusicas.clear();
                 listaMusicas = listaPastasMusica;
+
+                musicaAdapter.updateList(listaMusicas);
 
             } else {
                 new Thread(new Runnable() {
@@ -399,6 +419,7 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
 
                         // Os diretórios ficam disponíveis na lista
                         listaPastasMusica.clear();
+                        playlistManager.deletePlaylist("Folders");
 
 
                         for (String folder : mp3Folders) {
@@ -406,19 +427,15 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
                             List<String> temp = MP3Scanner.scanMp3Files(folder, false);
                             Musica tempM = new Musica(false, folder.substring(folder.lastIndexOf('/') + 1), folder, String.valueOf(temp.size()));
 
-
                             if (!listaPastasMusica.contains(tempM)) {
                                 listaPastasMusica.add(tempM);
-                                listarMP3(folder, true);
+                                //listarMP3(folder, true);
                             }
                         }
                         listaMusicas = listaPastasMusica;
-                        playlistManager.deletePlaylist("Folders");
                         playlistManager.savePlaylist("Folders", listaPastasMusica);
-                        try {
-                            musicaAdapter.updateList(listaMusicas);
-                        } catch (RuntimeException e) {
-                            throw new RuntimeException(e);
+                        for (String folder : mp3Folders) {
+                            listarMP3(folder, true);
                         }
 
                     }
@@ -427,8 +444,8 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
             }
         } else {
             listarMP3(folderToLoad, refresh);
-        }
 
+        }
         musicaAdapter.updateList(listaMusicas);
 
     }
@@ -541,7 +558,6 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
             try {
 
                 playerManager.setMusicPlay(PlayingNow, listaPlayingNow, 1);
-
                 updateScreenComponents();
                 startUpdateThread();
             } catch (IOException e) {
@@ -579,7 +595,6 @@ public class MainActivity extends AppCompatActivity implements MusicaAdapter.OnM
                     public void run() {
                         TrafficStats.setThreadStatsTag((int) Thread.currentThread().getId());
                         try {
-
                             ccont.cadastrarMusica(musica);
                         } catch (IOException | ClassNotFoundException e) {
                             throw new RuntimeException(e);

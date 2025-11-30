@@ -10,10 +10,15 @@
     <item
         android:id="@+id/foldersButton"
         android:title="@string/folders" />
-    <item android:title="Item" />
-    <item android:title="@string/playlist" />
-    <item android:title="@string/allMusics" />
-    <item android:title="@string/onMusic" />
+    <item
+        android:id="@+id/PlaylistsGeral"
+        android:title="@string/playlist" />
+    <item
+        android:id="@+id/AllTheMusic"
+        android:title="@string/allMusics" />
+    <item
+        android:id="@+id/OnlineMusicSearch"
+        android:title="@string/onMusic" />
     <item
         android:id="@+id/Loginbutt"
         android:title="@string/Login" />
